@@ -8,6 +8,8 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
 
+# TODO: fill in override methods for class ModifiedGeneralizedRCNN
+
 img = cv2.imread('000000000001.jpg')
 
 # build and load faster rcnn model
@@ -18,6 +20,9 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_5
 model = build_model(cfg).eval()
 DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 print("Model loaded")
+
+# TODO: convert model from class GeneralizedRCNN to class ModifiedGeneralizedRCNN
+
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)
