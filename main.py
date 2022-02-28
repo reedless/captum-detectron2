@@ -17,6 +17,7 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 model = build_model(cfg).eval()
 DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
+print("Model loaded")
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)
