@@ -20,8 +20,14 @@ model = build_model(cfg).eval()
 DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 print("Model loaded")
 
-# TODO: convert model from class GeneralizedRCNN to class ModifiedGeneralizedRCNN
 model = ModifiedGeneralizedRCNN(model)
+
+
+# # TODO: convert outputs to scalar using wrapper...?
+# def wrapper(input, selected_pred=0):
+#       outputs = model(input)
+#       return outputs[0]['instances'][selected_pred].pred_classes[0]
+
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)

@@ -1,4 +1,4 @@
-# sudo docker build -t sketch -f Dockerfile .
+# sudo docker build -t captum -f Dockerfile .
 
 FROM nvidia/cuda:11.6.0-devel-ubuntu20.04
 
