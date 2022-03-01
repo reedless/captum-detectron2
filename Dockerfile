@@ -1,6 +1,6 @@
 # sudo docker build -t captum -f Dockerfile .
 
-FROM nvidia/cuda:11.6.0-devel-ubuntu20.04
+FROM nvidia/cuda:10.0-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
