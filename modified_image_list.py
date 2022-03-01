@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import torch
 from detectron2.layers.wrappers import shapes_to_tensor
@@ -7,13 +7,13 @@ from torch.nn import functional as F
 
 
 class ModifiedImageList(ImageList):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, tensor: torch.Tensor, image_sizes: List[Tuple[int, int]]):
+        super().__init__(tensor, image_sizes)
 
     @staticmethod
     def from_tensors(
         tensors: List[torch.Tensor], size_divisibility: int = 0, pad_value: float = 0.0
-    ) -> "ImageList":
+    ) -> "ModifiedImageList":
         """
         Args:
             tensors: a tuple or list of `torch.Tensor`, each of shape (Hi, Wi) or
@@ -25,7 +25,7 @@ class ModifiedImageList(ImageList):
             pad_value (float): value to pad
 
         Returns:
-            an `ImageList`.
+            a `ModifiedImageList`.
         """
         assert len(tensors) > 0
         assert isinstance(tensors, (tuple, list))
@@ -60,7 +60,7 @@ class ModifiedImageList(ImageList):
             batch_shape = [len(tensors)] + list(tensors[0].shape[:-2]) + list(max_size)
             batched_imgs = tensors[0].new_full(batch_shape, pad_value)
             for img, pad_img in zip(tensors, batched_imgs):
-                # just add detach to pad_img...
+                # just add detach to pad_img
                 pad_img.detach()[..., :img.shape[-2], :img.shape[-1]].copy_(img)
 
-        return ImageList(batched_imgs.contiguous(), image_sizes)
+        return ModifiedImageList(batched_imgs.contiguous(), image_sizes)

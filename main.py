@@ -7,8 +7,7 @@ from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
-
-# TODO: fill in override methods for class ModifiedGeneralizedRCNN
+from modified_rcnn import ModifiedGeneralizedRCNN
 
 img = cv2.imread('000000000001.jpg')
 
@@ -22,7 +21,7 @@ DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 print("Model loaded")
 
 # TODO: convert model from class GeneralizedRCNN to class ModifiedGeneralizedRCNN
-
+model = ModifiedGeneralizedRCNN(model)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)

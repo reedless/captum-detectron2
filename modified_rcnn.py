@@ -6,12 +6,16 @@ from detectron2.modeling.postprocessing import detector_postprocess
 
 from modified_image_list import ModifiedImageList
 
-# TODO: fix class method for ModifiedImageList
-
 class ModifiedGeneralizedRCNN(GeneralizedRCNN):
-    def __init__(self, generalized_rcnn_instance):
-        super().__init__()
-        self.generalized_rcnn_instance = generalized_rcnn_instance
+    def __init__(self, generalized_rcnn_instance: GeneralizedRCNN):
+        super().__init__(backbone = generalized_rcnn_instance.backbone,
+                        proposal_generator = generalized_rcnn_instance.proposal_generator,
+                        roi_heads = generalized_rcnn_instance.roi_heads,
+                        pixel_mean = generalized_rcnn_instance.pixel_mean,
+                        pixel_std = generalized_rcnn_instance.pixel_std,
+                        input_format = generalized_rcnn_instance.input_format,
+                        vis_period = generalized_rcnn_instance.vis_period)
+        
 
     def preprocess_image(self, batched_inputs: List[Dict[str, torch.Tensor]]):
         """
@@ -32,8 +36,6 @@ class ModifiedGeneralizedRCNN(GeneralizedRCNN):
         for results_per_image, input_per_image, image_size in zip(
             instances, batched_inputs, image_sizes
         ):
-            # height = input_per_image.get("height", image_size[0])
-            # width = input_per_image.get("width", image_size[1])            
             height = image_size[0]
             width = image_size[1]
             r = detector_postprocess(results_per_image, height, width)
