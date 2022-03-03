@@ -27,6 +27,7 @@ model = ModifiedGeneralizedRCNN(model).eval()
 def wrapper(input, selected_class=0):
       outputs = model(input)
       result_classes = []
+      print(len(outputs))
 
       for i in range(len(outputs)):
             if len(outputs[i]["instances"]) > 0:
@@ -38,6 +39,7 @@ def wrapper(input, selected_class=0):
             else:
                   result_classes.append(80)
                   
+      print(result_classes)
       return result_classes
 
 # define input and baseline
