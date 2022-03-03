@@ -26,7 +26,7 @@ model = ModifiedGeneralizedRCNN(model).eval()
 # # TODO: convert outputs to scalar using wrapper...?
 def wrapper(input, selected_pred=0):
       outputs = model(input)
-      return outputs[0]['instances'][selected_pred].pred_classes[0]
+      return outputs[0]['instances'][selected_pred].pred_classes
 
 
 # define input and baseline
