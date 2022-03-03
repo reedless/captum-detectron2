@@ -26,6 +26,10 @@ model = ModifiedGeneralizedRCNN(model).eval()
 def wrapper(input, selected_pred=0):
       outputs = model(input)
       print(len(outputs))
+      print(outputs[0].keys())
+      print(outputs[0]["instances"])
+      print(outputs[0]["instances"][selected_pred])
+      print(outputs[0]["instances"][selected_pred].keys())
       return outputs[0]['instances'][selected_pred].pred_classes[0]
 
 
