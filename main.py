@@ -8,6 +8,7 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
 from modified_rcnn import ModifiedGeneralizedRCNN
+from functools import partial
 
 img = cv2.imread('000000000001.jpg')
 
@@ -26,8 +27,6 @@ model = ModifiedGeneralizedRCNN(model).eval()
 def wrapper(input, selected_class=0):
       outputs = model(input)
       result_classes = []
-
-
 
       for i in range(len(outputs)):
             if len(outputs[i]["instances"]) > 0:
@@ -57,7 +56,8 @@ for i in range(len(outputs[0]['instances'])):
             ))
 
       # Integrated Gradients
-      ig = IntegratedGradients(wrapper(selected_class=outputs[0]['instances'][0].pred_classes[i]))
+      wrapper_partial = partial(wrapper, selected_class=outputs[0]['instances'][0].pred_classes[i])
+      ig = IntegratedGradients(wrapper_partial)
       attributions, delta = ig.attribute(input_, baseline, target=0, return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
