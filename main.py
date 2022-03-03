@@ -45,7 +45,7 @@ for i in range(len(outputs[0]['instances'])):
             ))
 
       # Integrated Gradients
-      ig = IntegratedGradients(model)
+      ig = IntegratedGradients(wrapper)
       attributions, delta = ig.attribute(input_, baseline, target=0, return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
