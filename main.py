@@ -37,10 +37,10 @@ def wrapper(input, selected_class=0):
                   else:
                         result_classes.append(pred_classes[0])
             else:
-                  result_classes.append(80)
+                  result_classes.append(torch.tensor(80))
                   
       print(result_classes)
-      return result_classes
+      return torch.tensor(result_classes)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)
