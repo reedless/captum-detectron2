@@ -23,15 +23,23 @@ print("Model loaded")
 model = ModifiedGeneralizedRCNN(model).eval()
 
 
-def wrapper(input, selected_pred=0):
+def wrapper(input, selected_class=0):
       outputs = model(input)
-      print(len(outputs))
-      print(outputs[0].keys())
-      print(outputs[0]["instances"])
-      print(outputs[0]["instances"][selected_pred])
-      print(outputs[0]["instances"][selected_pred].keys())
-      return outputs[0]['instances'][selected_pred].pred_classes[0]
+      result_classes = []
 
+
+
+      for i in range(len(outputs)):
+            if len(outputs[i]["instances"]) > 0:
+                  pred_classes = outputs[i]["instances"].pred_classes
+                  if selected_class in pred_classes:
+                        result_classes.append(selected_class)
+                  else:
+                        result_classes.append(pred_classes[0])
+            else:
+                  result_classes.append(80)
+                  
+      return result_classes
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)
@@ -49,7 +57,7 @@ for i in range(len(outputs[0]['instances'])):
             ))
 
       # Integrated Gradients
-      ig = IntegratedGradients(wrapper)
+      ig = IntegratedGradients(wrapper(selected_class=outputs[0]['instances'][0].pred_classes[i]))
       attributions, delta = ig.attribute(input_, baseline, target=0, return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
