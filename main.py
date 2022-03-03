@@ -23,10 +23,10 @@ print("Model loaded")
 model = ModifiedGeneralizedRCNN(model).eval()
 
 
-# # TODO: convert outputs to scalar using wrapper...?
 def wrapper(input, selected_pred=0):
       outputs = model(input)
-      return outputs[0]['instances'][selected_pred].pred_classes
+      print(outputs)
+      return outputs[0]['instances'][selected_pred].pred_classes[0]
 
 
 # define input and baseline
@@ -46,7 +46,7 @@ for i in range(len(outputs[0]['instances'])):
 
       # Integrated Gradients
       ig = IntegratedGradients(model)
-      attributions, delta = ig.attribute(input_, baseline, target=0, return_convergence_delta=True)
+      attributions, delta = ig.attribute(input_, baseline, target=outputs[0]['instances'][0].pred_classes[i], return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
 
