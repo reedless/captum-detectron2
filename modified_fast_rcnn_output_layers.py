@@ -73,7 +73,7 @@ def fast_rcnn_inference_single_image(
         scores = scores[valid_mask]
 
     scores = scores[:, :-1]
-    class_scores = scores.detach().clone()
+    class_scores = scores.clone()
 
     num_bbox_reg_classes = boxes.shape[1] // 4
     # Convert to Boxes to use the `clip` function ...
