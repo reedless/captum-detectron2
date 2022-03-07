@@ -92,7 +92,6 @@ class ModifiedStandardROIHeads(StandardROIHeads):
             In training, a dict of losses.
             In inference, a list of `Instances`, the predicted instances.
         """
-        print("Forward box")
         features = [features[f] for f in self.box_in_features]
         box_features = self.box_pooler(features, [x.proposal_boxes for x in proposals])
         box_features = self.box_head(box_features)
@@ -111,6 +110,5 @@ class ModifiedStandardROIHeads(StandardROIHeads):
                         proposals_per_image.proposal_boxes = Boxes(pred_boxes_per_image)
             return losses
         else:
-            print("Forward box end")
             pred_instances, _ = self.box_predictor.inference(predictions, proposals)
             return pred_instances

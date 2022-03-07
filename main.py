@@ -45,8 +45,8 @@ def wrapper(input, selected_class=0, total_classes=80):
                   # if no instances are detected, return 0.0 for all classes
                   result_class_probabilities.append(torch.tensor([0.0 for i in range(total_classes)]))
                   
-      print(result_class_probabilities)
-      return torch.tensor(result_class_probabilities) # need to output probabilities not just one hot?
+      print(len(result_class_probabilities))
+      return torch.tensor(result_class_probabilities)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)

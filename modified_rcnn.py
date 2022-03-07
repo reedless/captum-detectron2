@@ -108,14 +108,12 @@ class ModifiedGeneralizedRCNN(GeneralizedRCNN):
             Otherwise, a list[Instances] containing raw network outputs.
         """
         assert not self.training
-        print("Inference")
 
         images = self.preprocess_image(batched_inputs)
         features = self.backbone(images.tensor)
 
         if detected_instances is None:
             if self.proposal_generator is not None:
-                print("Proposals")
                 proposals, _ = self.proposal_generator(images, features, None)
             else:
                 assert "proposals" in batched_inputs[0]
