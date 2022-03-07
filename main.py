@@ -42,7 +42,7 @@ def wrapper(input, selected_class=0, total_classes=80):
                         result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
             else:
                   # if no instances are detected, return 0.0 for all classes
-                  result_class_probabilities.append(torch.tensor([0.0 for i in range(total_classes)]))
+                  result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
       return torch.stack(result_class_probabilities)
 
