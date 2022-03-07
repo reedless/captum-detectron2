@@ -29,7 +29,6 @@ print("Modified model loaded")
 def wrapper(input, selected_class=0, total_classes=80):
       outputs = modified(input)
       result_class_probabilities = []
-      print(len(outputs))
 
       for i in range(len(outputs)): # for each input image
             if len(outputs[i]["instances"]) > 0:
@@ -45,7 +44,6 @@ def wrapper(input, selected_class=0, total_classes=80):
                   # if no instances are detected, return 0.0 for all classes
                   result_class_probabilities.append(torch.tensor([0.0 for i in range(total_classes)]))
                   
-      print(len(result_class_probabilities))
       return torch.tensor(result_class_probabilities)
 
 # define input and baseline
@@ -55,12 +53,12 @@ baseline = torch.zeros(input_.shape).to(device)
 # run input through modified model to get number of instances
 outputs = modified(input_)
 
-print(outputs)
+print(outputs[0]['instances'][0].pred_classes)
 
 for i in range(len(outputs[0]['instances'])):
       print(("Selecting instance prediction of "
             "class {} with "
-            "score {} probability.".format(outputs[0]['instances'][0].pred_classes[i], outputs[0]['instances'][0].class_scores[i])
+            "score {} probability.".format(outputs[0]['instances'][0].pred_classes[i], outputs[0]['instances'][0].scores[i])
             ))
 
       # Integrated Gradients
