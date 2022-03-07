@@ -33,5 +33,9 @@ class ModifiedStandardROIHeads(StandardROIHeads):
                          keypoint_pooler = keypoint_pooler,
                          keypoint_head = keypoint_head,
                          train_on_pred_boxes = standard_roi_heads_instance.train_on_pred_boxes,
-                        )
-
+                         batch_size_per_image = standard_roi_heads_instance.batch_size_per_image,
+                         positive_fraction = standard_roi_heads_instance.positive_fraction,
+                         num_classes = standard_roi_heads_instance.num_classes,
+                         proposal_matcher = standard_roi_heads_instance.proposal_matcher,
+                         )
+                         
