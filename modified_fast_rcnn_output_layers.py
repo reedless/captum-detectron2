@@ -73,6 +73,7 @@ def fast_rcnn_inference_single_image(
         scores = scores[valid_mask]
 
     scores = scores[:, :-1]
+    print(scores.shape)
     class_scores = scores.detach().clone()
 
     num_bbox_reg_classes = boxes.shape[1] // 4
@@ -105,6 +106,8 @@ def fast_rcnn_inference_single_image(
     result.scores = scores
     result.class_scores = class_scores
     result.pred_classes = filter_inds[:, 1]
+
+    print(result)
 
     return result, filter_inds[:, 0]
 
