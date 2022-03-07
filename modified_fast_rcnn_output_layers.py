@@ -120,7 +120,7 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
                          test_score_thresh = fast_rcnn_output_layers_instance.test_score_thresh,
                          test_nms_thresh = fast_rcnn_output_layers_instance.test_nms_thresh,
                          test_topk_per_image = fast_rcnn_output_layers_instance.test_topk_per_image,
-                         cls_agnostic_bbox_reg = fast_rcnn_output_layers_instance.num_classes > 1,
+                         cls_agnostic_bbox_reg = fast_rcnn_output_layers_instance.num_classes == 1,
                          smooth_l1_beta = fast_rcnn_output_layers_instance.smooth_l1_beta,
                          box_reg_loss_type = fast_rcnn_output_layers_instance.box_reg_loss_type,
                          loss_weight = fast_rcnn_output_layers_instance.loss_weight
