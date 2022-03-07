@@ -1,13 +1,14 @@
 from typing import Dict, List, Optional
-from detectron2.structures import Instances
 
 import torch
 from detectron2.modeling.meta_arch.rcnn import GeneralizedRCNN
 from detectron2.modeling.postprocessing import detector_postprocess
+from detectron2.structures import Instances
 from detectron2.utils.events import get_event_storage
 
 from modified_image_list import ModifiedImageList
 from modified_standard_roi_heads import ModifiedStandardROIHeads
+
 
 class ModifiedGeneralizedRCNN(GeneralizedRCNN):
     def __init__(self, generalized_rcnn_instance: GeneralizedRCNN):

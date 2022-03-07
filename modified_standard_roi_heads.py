@@ -1,5 +1,7 @@
 from detectron2.modeling.roi_heads.roi_heads import StandardROIHeads
+
 from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
+
 
 class ModifiedStandardROIHeads(StandardROIHeads):
     def __init__(self, standard_roi_heads_instance: StandardROIHeads) -> None:

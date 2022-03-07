@@ -1,3 +1,5 @@
+from functools import partial
+
 import cv2
 import torch
 from captum.attr import (DeepLift, DeepLiftShap, GradientShap,
@@ -7,8 +9,8 @@ from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
+
 from modified_rcnn import ModifiedGeneralizedRCNN
-from functools import partial
 
 img = cv2.imread('000000000001.jpg')
 
