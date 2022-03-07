@@ -110,7 +110,7 @@ def fast_rcnn_inference_single_image(
 
 
 class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
-    def __init__(self, fast_rcnn_output_layers_instance) -> None:
+    def __init__(self, fast_rcnn_output_layers_instance):
         super().__init__(input_shape = fast_rcnn_output_layers_instance.cls_score.in_features,
                          box2box_transform = fast_rcnn_output_layers_instance.box2box_transform,
                          num_classes = fast_rcnn_output_layers_instance.num_classes,
