@@ -23,7 +23,8 @@ model = build_model(cfg).eval()
 DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 print("Model loaded")
 
-model = ModifiedGeneralizedRCNN(model).eval()
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model = ModifiedGeneralizedRCNN(model).to(device).eval()
 
 
 def wrapper(input, selected_class=0):
@@ -48,8 +49,8 @@ def wrapper(input, selected_class=0):
       return torch.tensor(result_classes) # need to output probabilities not just one hot?
 
 # define input and baseline
-input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0)
-baseline = torch.zeros(input_.shape)
+input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
+baseline = torch.zeros(input_.shape).to(device)
 
 # run input through model to get number of instances
 outputs = model(input_)
