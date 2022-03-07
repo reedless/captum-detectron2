@@ -52,8 +52,8 @@ def wrapper(input, selected_class=0, total_classes=80):
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
 baseline = torch.zeros(input_.shape).to(device)
 
-# run input through model to get number of instances
-outputs = model(input_)
+# run input through modified model to get number of instances
+outputs = modified(input_)
 
 print(outputs)
 
