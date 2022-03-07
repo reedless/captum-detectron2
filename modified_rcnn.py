@@ -7,16 +7,18 @@ from detectron2.modeling.postprocessing import detector_postprocess
 from detectron2.utils.events import get_event_storage
 
 from modified_image_list import ModifiedImageList
+from modified_standard_roi_heads import ModifiedStandardROIHeads
 
 class ModifiedGeneralizedRCNN(GeneralizedRCNN):
     def __init__(self, generalized_rcnn_instance: GeneralizedRCNN):
         super().__init__(backbone = generalized_rcnn_instance.backbone,
                         proposal_generator = generalized_rcnn_instance.proposal_generator,
-                        roi_heads = generalized_rcnn_instance.roi_heads,
+                        roi_heads = ModifiedStandardROIHeads(generalized_rcnn_instance.roi_heads),
                         pixel_mean = generalized_rcnn_instance.pixel_mean,
                         pixel_std = generalized_rcnn_instance.pixel_std,
                         input_format = generalized_rcnn_instance.input_format,
-                        vis_period = generalized_rcnn_instance.vis_period)
+                        vis_period = generalized_rcnn_instance.vis_period
+                        )
         
 
     def preprocess_image(self, batched_inputs: List[Dict[str, torch.Tensor]]):

@@ -37,6 +37,9 @@ def wrapper(input, selected_class=0):
                   else:
                         result_classes.append(pred_classes[0])
             else:
+                  # TODO: consider if should return background (class 80) or not?
+                  #     Since detectron2.modeling.roi_heads.fast_rcnn.fast_rcnn_inference_single_image 
+                  #     removes "class probabilities" of background
                   result_classes.append(torch.tensor(80).to(input.device))
                   
       print(result_classes)
@@ -52,9 +55,9 @@ outputs = model(input_)
 print(outputs)
 
 for i in range(len(outputs[0]['instances'])):
-      print((f"Selecting instance prediction of "
-            f"class {outputs[0]['instances'][0].pred_classes[i]} with "
-            f"score {outputs[0]['instances'][0].scores[i]} probability."
+      print(("Selecting instance prediction of "
+            "class {} with "
+            "score {} probability.".format(outputs[0]['instances'][0].pred_classes[i], outputs[0]['instances'][0].scores[i])
             ))
 
       # Integrated Gradients
