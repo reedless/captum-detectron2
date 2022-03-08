@@ -26,24 +26,27 @@ DetectionCheckpointer(modified).load(cfg.MODEL.WEIGHTS)
 
 print("Modified model loaded")
 
-def wrapper(input, selected_class=0, total_classes=80):
+def wrapper(input):
+      # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified(input)
       result_class_probabilities = []
+      for output in outputs:
+            result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
 
-      for i in range(len(outputs)): # for each input image
-            if len(outputs[i]["instances"]) > 0: # instances detected
-                  pred_classes = outputs[i]["instances"].pred_classes
-                  if selected_class in pred_classes:
-                        # pick first occurance of selected class
-                        for j in range(len(pred_classes)):
-                              if pred_classes[j] == selected_class:
-                                    result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
-                                    break
-                  else:
-                        result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
-            else:
-                  # if no instances are detected, return 0.0 for all classes
-                  result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
+      # for i in range(len(outputs)): # for each input image
+      #       if len(outputs[i]["instances"]) > 0: # instances detected
+      #             pred_classes = outputs[i]["instances"].pred_classes
+      #             if selected_class in pred_classes:
+      #                   # pick first occurance of selected class
+      #                   for j in range(len(pred_classes)):
+      #                         if pred_classes[j] == selected_class:
+      #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
+      #                               break
+      #             else:
+      #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
+      #       else:
+      #             # if no instances are detected, return 0.0 for all classes
+      #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
       return torch.stack(result_class_probabilities)
 
@@ -69,8 +72,8 @@ for i in range(len(outputs[0]['instances'])):
       ig = IntegratedGradients(wrapper)
       attributions, delta = ig.attribute(input_, 
                                          target=int(outputs[0]['instances'][0].pred_classes[i]), 
-                                         additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
-                                                                    len(outputs[0]['instances'].class_scores[0])),
+                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+                                    #                                 len(outputs[0]['instances'].class_scores[0])),
                                          return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
