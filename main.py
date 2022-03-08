@@ -44,7 +44,7 @@ def wrapper(input, selected_class=0, total_classes=80):
                   # if no instances are detected, return 0.0 for all classes
                   result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
-      return torch.stack(result_class_probabilities).detach()
+      return torch.stack(result_class_probabilities)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
