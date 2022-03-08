@@ -32,10 +32,10 @@ print("Modified model loaded")
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
-
-      result_class_probabilities = []
-      for output in outputs:
-            result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
+      return outputs
+      # result_class_probabilities = []
+      # for output in outputs:
+      #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
 
       # for i in range(len(outputs)): # for each input image
       #       if len(outputs[i]["instances"]) > 0: # instances detected
@@ -52,7 +52,7 @@ def wrapper(input):
       #             # if no instances are detected, return 0.0 for all classes
       #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
-      return torch.stack(result_class_probabilities)
+      # return torch.stack(result_class_probabilities)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
