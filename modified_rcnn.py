@@ -89,6 +89,7 @@ class ModifiedGeneralizedRCNN(GeneralizedRCNN):
         batched_inputs: List[Dict[str, torch.Tensor]],
         detected_instances: Optional[List[Instances]] = None,
         do_postprocess: bool = True,
+        class_scores_only: bool = False,
     ):
         """
         Run inference on the given inputs.
@@ -119,7 +120,7 @@ class ModifiedGeneralizedRCNN(GeneralizedRCNN):
                 assert "proposals" in batched_inputs[0]
                 proposals = [x["proposals"].to(self.device) for x in batched_inputs]
 
-            results, _ = self.roi_heads.forward(images, features, proposals, None)
+            results, _ = self.roi_heads.forward(images, features, proposals, None, class_scores_only)
         else:
             detected_instances = [x.to(self.device) for x in detected_instances]
             results = self.roi_heads.forward_with_given_boxes(features, detected_instances)

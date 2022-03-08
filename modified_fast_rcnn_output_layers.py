@@ -13,6 +13,7 @@ def fast_rcnn_inference(
     score_thresh: float,
     nms_thresh: float,
     topk_per_image: int,
+    class_scores_only: bool
 ):
     """
     Call `fast_rcnn_inference_single_image` for all images.
@@ -41,10 +42,13 @@ def fast_rcnn_inference(
     """
     result_per_image = [
         fast_rcnn_inference_single_image(
-            boxes_per_image, scores_per_image, image_shape, score_thresh, nms_thresh, topk_per_image
+            boxes_per_image, scores_per_image, image_shape, score_thresh, nms_thresh, topk_per_image, class_scores_only
         )
         for scores_per_image, boxes_per_image, image_shape in zip(scores, boxes, image_shapes)
     ]
+    if class_scores_only:
+        return torch.stack([x[0] for x in result_per_image]), [x[1] for x in result_per_image]
+
     return [x[0] for x in result_per_image], [x[1] for x in result_per_image]
 
 
@@ -55,6 +59,7 @@ def fast_rcnn_inference_single_image(
     score_thresh: float,
     nms_thresh: float,
     topk_per_image: int,
+    class_scores_only: bool
 ):
     """
     Single-image inference. Return bounding-box detection results by thresholding
@@ -100,13 +105,16 @@ def fast_rcnn_inference_single_image(
         keep = keep[:topk_per_image]
     boxes, scores, filter_inds, class_scores = boxes[keep], scores[keep], filter_inds[keep], class_scores[keep]
 
+    if class_scores_only:
+        return class_scores.sum(dim=0), filter_inds[:, 0]
+
     result = Instances(image_shape)
     result.pred_boxes = Boxes(boxes.detach())
     result.scores = scores.detach()
     result.class_scores = class_scores
     result.pred_classes = filter_inds[:, 1].detach()
 
-    return class_scores, filter_inds[:, 0]
+    return result, filter_inds[:, 0]
 
 
 class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
@@ -123,7 +131,7 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
                          loss_weight = fast_rcnn_output_layers_instance.loss_weight
                         )
 
-    def inference(self, predictions: Tuple[torch.Tensor, torch.Tensor], proposals: List[Instances]):
+    def inference(self, predictions: Tuple[torch.Tensor, torch.Tensor], proposals: List[Instances], class_scores_only: bool = False):
         """
         Args:
             predictions: return values of :meth:`forward()`.
@@ -144,4 +152,5 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
             self.test_score_thresh,
             self.test_nms_thresh,
             self.test_topk_per_image,
+            class_scores_only
         )

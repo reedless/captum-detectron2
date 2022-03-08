@@ -22,7 +22,7 @@ cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 
 model = build_model(cfg).to(device).eval()
-DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
+# DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 
 modified = ModifiedGeneralizedRCNN(model).to(device).eval()
 DetectionCheckpointer(modified).load(cfg.MODEL.WEIGHTS)
@@ -31,35 +31,35 @@ print("Modified model loaded")
 
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
-      outputs = modified.inference(input, do_postprocess=False)
-      return outputs
-      # result_class_probabilities = []
-      # for output in outputs:
-      #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
+      outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
 
-      # # for i in range(len(outputs)): # for each input image
-      # #       if len(outputs[i]["instances"]) > 0: # instances detected
-      # #             pred_classes = outputs[i]["instances"].pred_classes
-      # #             if selected_class in pred_classes:
-      # #                   # pick first occurance of selected class
-      # #                   for j in range(len(pred_classes)):
-      # #                         if pred_classes[j] == selected_class:
-      # #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
-      # #                               break
-      # #             else:
-      # #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
-      # #       else:
-      # #             # if no instances are detected, return 0.0 for all classes
-      # #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
+      result_class_probabilities = []
+      for output in outputs:
+            result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
+
+      # for i in range(len(outputs)): # for each input image
+      #       if len(outputs[i]["instances"]) > 0: # instances detected
+      #             pred_classes = outputs[i]["instances"].pred_classes
+      #             if selected_class in pred_classes:
+      #                   # pick first occurance of selected class
+      #                   for j in range(len(pred_classes)):
+      #                         if pred_classes[j] == selected_class:
+      #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
+      #                               break
+      #             else:
+      #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
+      #       else:
+      #             # if no instances are detected, return 0.0 for all classes
+      #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
-      # return torch.stack(result_class_probabilities)
+      return torch.stack(result_class_probabilities)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
 # baseline = torch.zeros(input_.shape).to(device)
 
 # run input through modified model to get number of instances
-outputs = model(input_)
+outputs = modified.inference(input_)
 
 print(outputs[0]['instances'].pred_classes.unique())
 

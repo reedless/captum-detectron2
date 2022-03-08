@@ -49,6 +49,7 @@ class ModifiedStandardROIHeads(StandardROIHeads):
         features: Dict[str, torch.Tensor],
         proposals: List[Instances],
         targets: Optional[List[Instances]] = None,
+        class_scores_only: bool = False,
     ) -> Tuple[List[Instances], Dict[str, torch.Tensor]]:
         """
         See :class:`ROIHeads.forward`.
@@ -68,14 +69,14 @@ class ModifiedStandardROIHeads(StandardROIHeads):
             losses.update(self._forward_keypoint(features, proposals))
             return proposals, losses
         else:
-            pred_instances = self._forward_box(features, proposals)
+            pred_instances = self._forward_box(features, proposals, class_scores_only)
             # During inference cascaded prediction is used: the mask and keypoints heads are only
             # applied to the top scoring box detections.
             # pred_instances = self.forward_with_given_boxes(features, pred_instances)
             return pred_instances, {}
 
 
-    def _forward_box(self, features: Dict[str, torch.Tensor], proposals: List[Instances]):
+    def _forward_box(self, features: Dict[str, torch.Tensor], proposals: List[Instances], class_scores_only: bool = False):
         """
         Forward logic of the box prediction branch. If `self.train_on_pred_boxes is True`,
             the function puts predicted boxes in the `proposal_boxes` field of `proposals` argument.
@@ -110,5 +111,5 @@ class ModifiedStandardROIHeads(StandardROIHeads):
                         proposals_per_image.proposal_boxes = Boxes(pred_boxes_per_image)
             return losses
         else:
-            pred_instances, _ = self.box_predictor.inference(predictions, proposals)
+            pred_instances, _ = self.box_predictor.inference(predictions, proposals, class_scores_only)
             return pred_instances
