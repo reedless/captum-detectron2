@@ -71,7 +71,7 @@ class ModifiedStandardROIHeads(StandardROIHeads):
             pred_instances = self._forward_box(features, proposals)
             # During inference cascaded prediction is used: the mask and keypoints heads are only
             # applied to the top scoring box detections.
-            pred_instances = self.forward_with_given_boxes(features, pred_instances)
+            # pred_instances = self.forward_with_given_boxes(features, pred_instances)
             return pred_instances, {}
 
 

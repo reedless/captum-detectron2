@@ -106,7 +106,7 @@ def fast_rcnn_inference_single_image(
     result.class_scores = class_scores
     result.pred_classes = filter_inds[:, 1].detach()
 
-    return result, filter_inds[:, 0]
+    return class_scores, filter_inds[:, 0]
 
 
 class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):

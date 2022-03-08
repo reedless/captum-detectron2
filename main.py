@@ -13,14 +13,17 @@ from detectron2.modeling import build_model
 from modified_rcnn import ModifiedGeneralizedRCNN
 
 img = cv2.imread('000000000001.jpg')
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # build and load faster rcnn model
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
-model = build_model(cfg).eval()
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+model = build_model(cfg).to(device).eval()
+DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
+
 modified = ModifiedGeneralizedRCNN(model).to(device).eval()
 DetectionCheckpointer(modified).load(cfg.MODEL.WEIGHTS)
 
@@ -28,7 +31,7 @@ print("Modified model loaded")
 
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
-      outputs = modified(input)
+      outputs = modified.inference(input, do_postprocess=False)
       result_class_probabilities = []
       for output in outputs:
             result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
@@ -55,7 +58,7 @@ input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
 # baseline = torch.zeros(input_.shape).to(device)
 
 # run input through modified model to get number of instances
-outputs = modified(input_)
+outputs = model(input_)
 
 print(outputs[0]['instances'].pred_classes.unique())
 
