@@ -57,13 +57,13 @@ input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
 # run input through modified model to get number of instances
 outputs = modified(input_)
 
-print(outputs[0]['instances'].pred_classes)
+print(outputs[0]['instances'].pred_classes.unique())
 
-for i in range(len(outputs[0]['instances'])):
-      print(("Selecting instance prediction of "
-            "class {} with "
-            "score {} probability.".format(outputs[0]['instances'].pred_classes[i], outputs[0]['instances'].scores[i])
-            ))
+for pred_class in outputs[0]['instances'].pred_classes.unique():
+      # print(("Selecting instance prediction of "
+      #       "class {} with "
+      #       "score {} probability.".format(outputs[0]['instances'].pred_classes[i], outputs[0]['instances'].scores[i])
+      #       ))
 
       # Integrated Gradients
       # wrapper_partial = partial(wrapper, 
@@ -71,7 +71,7 @@ for i in range(len(outputs[0]['instances'])):
       #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
       ig = IntegratedGradients(wrapper)
       attributions, delta = ig.attribute(input_, 
-                                         target=int(outputs[0]['instances'][0].pred_classes[i]), 
+                                         target=pred_class, 
                                     #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
                                     #                                 len(outputs[0]['instances'].class_scores[0])),
                                          return_convergence_delta=True)
