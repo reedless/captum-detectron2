@@ -101,7 +101,7 @@ def fast_rcnn_inference_single_image(
     boxes, scores, filter_inds, class_scores = boxes[keep], scores[keep], filter_inds[keep], class_scores[keep]
 
     result = Instances(image_shape)
-    result.pred_boxes = Boxes(boxes)
+    result.pred_boxes = boxes.detach()
     result.scores = scores.detach()
     result.class_scores = class_scores
     result.pred_classes = filter_inds[:, 1]
