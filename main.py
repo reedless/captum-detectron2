@@ -31,9 +31,10 @@ def wrapper(input, selected_class=0, total_classes=80):
       result_class_probabilities = []
 
       for i in range(len(outputs)): # for each input image
-            if len(outputs[i]["instances"]) > 0:
+            if len(outputs[i]["instances"]) > 0: # instances detected
                   pred_classes = outputs[i]["instances"].pred_classes
                   if selected_class in pred_classes:
+                        # pick first occurance of selected class
                         for j in range(len(pred_classes)):
                               if pred_classes[j] == selected_class:
                                     result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
@@ -48,7 +49,7 @@ def wrapper(input, selected_class=0, total_classes=80):
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
-baseline = torch.zeros(input_.shape).to(device)
+# baseline = torch.zeros(input_.shape).to(device)
 
 # run input through modified model to get number of instances
 outputs = modified(input_)
@@ -62,11 +63,15 @@ for i in range(len(outputs[0]['instances'])):
             ))
 
       # Integrated Gradients
-      wrapper_partial = partial(wrapper, 
-                                selected_class=outputs[0]['instances'][0].pred_classes[i], 
-                                total_classes = len(outputs[0]['instances'].class_scores[0]))
-      ig = IntegratedGradients(wrapper_partial)
-      attributions, delta = ig.attribute(input_, baseline, target=0, return_convergence_delta=True)
+      # wrapper_partial = partial(wrapper, 
+      #                           selected_class = outputs[0]['instances'][0].pred_classes[i], 
+      #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
+      ig = IntegratedGradients(wrapper)
+      attributions, delta = ig.attribute(input_, 
+                                         target=int(outputs[0]['instances'][0].pred_classes[i]), 
+                                         additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+                                                                    len(outputs[0]['instances'].class_scores[0])),
+                                         return_convergence_delta=True)
       print('IG Attributions:', attributions)
       print('Convergence Delta:', delta)
 
