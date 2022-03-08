@@ -32,26 +32,27 @@ print("Modified model loaded")
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified.inference(input, do_postprocess=False)
-      result_class_probabilities = []
-      for output in outputs:
-            result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
+      return outputs
+      # result_class_probabilities = []
+      # for output in outputs:
+      #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
 
-      # for i in range(len(outputs)): # for each input image
-      #       if len(outputs[i]["instances"]) > 0: # instances detected
-      #             pred_classes = outputs[i]["instances"].pred_classes
-      #             if selected_class in pred_classes:
-      #                   # pick first occurance of selected class
-      #                   for j in range(len(pred_classes)):
-      #                         if pred_classes[j] == selected_class:
-      #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
-      #                               break
-      #             else:
-      #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
-      #       else:
-      #             # if no instances are detected, return 0.0 for all classes
-      #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
+      # # for i in range(len(outputs)): # for each input image
+      # #       if len(outputs[i]["instances"]) > 0: # instances detected
+      # #             pred_classes = outputs[i]["instances"].pred_classes
+      # #             if selected_class in pred_classes:
+      # #                   # pick first occurance of selected class
+      # #                   for j in range(len(pred_classes)):
+      # #                         if pred_classes[j] == selected_class:
+      # #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
+      # #                               break
+      # #             else:
+      # #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
+      # #       else:
+      # #             # if no instances are detected, return 0.0 for all classes
+      # #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
                   
-      return torch.stack(result_class_probabilities)
+      # return torch.stack(result_class_probabilities)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
