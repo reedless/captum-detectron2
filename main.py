@@ -96,19 +96,19 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
 
-      # Deep Lift
-      dl = DeepLift(wrapper)
-      attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
-      print('DeepLift Attributions:', attributions)
-      print('Convergence Delta:', delta)
-
-
-      # # Deep Lift SHAP
-      # dl = DeepLiftShap(wrapper)
-      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
-      # print('DeepLiftSHAP Attributions:', attributions)
+      # # Deep Lift
+      # dl = DeepLift(wrapper)
+      # attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
+      # print('DeepLift Attributions:', attributions)
       # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+
+
+      # Deep Lift SHAP
+      dl = DeepLiftShap(wrapper)
+      attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+      print('DeepLiftSHAP Attributions:', attributions)
+      print('Convergence Delta:', delta)
+      print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
 
       # # Noise Tunnel + Integrated Gradients
