@@ -73,38 +73,38 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # wrapper_partial = partial(wrapper, 
       #                           selected_class = outputs[0]['instances'][0].pred_classes[i], 
       #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
-      ig = IntegratedGradients(wrapper)
-      attributions, delta = ig.attribute(input_, 
-                                         target=pred_class, 
-                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
-                                    #                                 len(outputs[0]['instances'].class_scores[0])),
-                                         return_convergence_delta=True)
-      print('IG Attributions:', attributions)
-      print('Convergence Delta:', delta)
+      # ig = IntegratedGradients(wrapper)
+      # attributions, delta = ig.attribute(input_, 
+      #                                    target=pred_class, 
+      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
+      #                                    return_convergence_delta=True)
+      # print('IG Attributions:', attributions)
+      # print('Convergence Delta:', delta)
 
 
       # # Gradient SHAP
-      # gs = GradientShap(model)
+      gs = GradientShap(wrapper)
 
-      # # We define a distribution of baselines and draw `n_samples` from that
-      # # distribution in order to estimate the expectations of gradients across all baselines
-      # baseline_dist = torch.randn(5, 3, 480, 640) * 0.001
-      # attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
-      #                               target=0, return_convergence_delta=True)
-      # print('GradientShap Attributions:', attributions)
-      # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      # We define a distribution of baselines and draw `n_samples` from that
+      # distribution in order to estimate the expectations of gradients across all baselines
+      baseline_dist = torch.randn(5, 3, 480, 640) * 0.001
+      attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
+                                    target=0, return_convergence_delta=True)
+      print('GradientShap Attributions:', attributions)
+      print('Convergence Delta:', delta)
+      print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
 
       # # Deep Lift
-      # dl = DeepLift(model)
+      # dl = DeepLift(wrapper)
       # attributions, delta = dl.attribute(input_, baseline, target=0, return_convergence_delta=True)
       # print('DeepLift Attributions:', attributions)
       # print('Convergence Delta:', delta)
 
 
       # # Deep Lift SHAP
-      # dl = DeepLiftShap(model)
+      # dl = DeepLiftShap(wrapper)
       # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
       # print('DeepLiftSHAP Attributions:', attributions)
       # print('Convergence Delta:', delta)
@@ -112,7 +112,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
 
 
       # # Noise Tunnel + Integrated Gradients
-      # ig = IntegratedGradients(model)
+      # ig = IntegratedGradients(wrapper)
       # nt = NoiseTunnel(ig)
       # attributions, delta = nt.attribute(input_, nt_type='smoothgrad', stdevs=0.02, nt_samples=4,
       #       baselines=baseline, target=0, return_convergence_delta=True)
@@ -122,13 +122,13 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
 
 
       # # Neuron Conductance
-      # nc = NeuronConductance(model, model.backbone)
+      # nc = NeuronConductance(wrapper, model.backbone)
       # attributions = nc.attribute(input_, neuron_selector=1, target=0)
       # print('Neuron Attributions:', attributions)
 
 
       # # Layer Conductance
-      # lc = LayerConductance(model, model.backbone)
+      # lc = LayerConductance(wrapper, model.backbone)
       # attributions, delta = lc.attribute(input_, baselines=baseline, target=0, return_convergence_delta=True)
       # print('Layer Attributions:', attributions)
       # print('Convergence Delta:', delta)
