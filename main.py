@@ -13,7 +13,7 @@ from detectron2.modeling import build_model
 from modified_rcnn import ModifiedGeneralizedRCNN
 
 img = cv2.imread('000000000001.jpg')
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # build and load faster rcnn model
 cfg = get_cfg()
