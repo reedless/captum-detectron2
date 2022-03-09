@@ -13,7 +13,7 @@ from detectron2.modeling import build_model
 from modified_rcnn import ModifiedGeneralizedRCNN
 
 img = cv2.imread('000000000001.jpg')
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda")
 
 # build and load faster rcnn model
 cfg = get_cfg()
@@ -88,9 +88,9 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
 
       # We define a distribution of baselines and draw `n_samples` from that
       # distribution in order to estimate the expectations of gradients across all baselines
-      baseline_dist = torch.randn(5, 3, 480, 640) * 0.001
+      baseline_dist = torch.randn(5, 3, 480, 640).to(device) * 0.001
       attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
-                                    target=0, return_convergence_delta=True)
+                                    target=pred_class, return_convergence_delta=True)
       print('GradientShap Attributions:', attributions)
       print('Convergence Delta:', delta)
       print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
