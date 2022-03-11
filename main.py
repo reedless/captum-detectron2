@@ -32,7 +32,7 @@ print("Modified model loaded")
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
-      return outputs
+      return outputs.sum(dim=-2)
       # result_class_probabilities = []
       # for output in outputs:
       #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
@@ -74,14 +74,14 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # wrapper_partial = partial(wrapper, 
       #                           selected_class = outputs[0]['instances'][0].pred_classes[i], 
       #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
-      # ig = IntegratedGradients(wrapper)
-      # attributions, delta = ig.attribute(input_, 
-      #                                    target=pred_class, 
-      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
-      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
-      #                                    return_convergence_delta=True)
-      # print('IG Attributions:', attributions)
-      # print('Convergence Delta:', delta)
+      ig = IntegratedGradients(wrapper)
+      attributions, delta = ig.attribute(input_, 
+                                         target=pred_class, 
+                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+                                    #                                 len(outputs[0]['instances'].class_scores[0])),
+                                         return_convergence_delta=True)
+      print('IG Attributions:', attributions)
+      print('Convergence Delta:', delta)
 
 
       # # Gradient SHAP
@@ -103,12 +103,12 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('Convergence Delta:', delta)
 
 
-      # Deep Lift SHAP
-      dl = DeepLiftShap(wrapper)
-      attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
-      print('DeepLiftSHAP Attributions:', attributions)
-      print('Convergence Delta:', delta)
-      print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      # # Deep Lift SHAP
+      # dl = DeepLiftShap(wrapper)
+      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+      # print('DeepLiftSHAP Attributions:', attributions)
+      # print('Convergence Delta:', delta)
+      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
 
       # # Noise Tunnel + Integrated Gradients
