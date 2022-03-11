@@ -47,7 +47,7 @@ def fast_rcnn_inference(
         for scores_per_image, boxes_per_image, image_shape in zip(scores, boxes, image_shapes)
     ]
     if class_scores_only:
-        return torch.cat([x[0].unsqueeze(0) for x in result_per_image]), [x[1] for x in result_per_image]
+        return [x[0] for x in result_per_image], [x[1] for x in result_per_image]
 
     return [x[0] for x in result_per_image], [x[1] for x in result_per_image]
 
@@ -106,8 +106,7 @@ def fast_rcnn_inference_single_image(
     boxes, scores, filter_inds, class_scores = boxes[keep], scores[keep], filter_inds[keep], class_scores[keep]
 
     if class_scores_only:
-        print(class_scores.shape, filter_inds.shape)
-        return class_scores, filter_inds[:, 0]
+        return class_scores.sum(dim=0), filter_inds[:, 0]
 
     result = Instances(image_shape)
     result.pred_boxes = Boxes(boxes.detach())
