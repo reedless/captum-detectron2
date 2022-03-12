@@ -120,6 +120,7 @@ def fast_rcnn_inference_single_image(
 
 class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
     def __init__(self, fast_rcnn_output_layers_instance):
+        self.class_scores_only = False
         super().__init__(input_shape = fast_rcnn_output_layers_instance.cls_score.in_features,
                          box2box_transform = fast_rcnn_output_layers_instance.box2box_transform,
                          num_classes = fast_rcnn_output_layers_instance.num_classes,
@@ -132,7 +133,7 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
                          loss_weight = fast_rcnn_output_layers_instance.loss_weight
                         )
 
-    def inference(self, predictions: Tuple[torch.Tensor, torch.Tensor], proposals: List[Instances], class_scores_only: bool = False):
+    def inference(self, predictions: Tuple[torch.Tensor, torch.Tensor], proposals: List[Instances]):
         """
         Args:
             predictions: return values of :meth:`forward()`.
@@ -143,6 +144,7 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
             list[Instances]: same as `fast_rcnn_inference`.
             list[Tensor]: same as `fast_rcnn_inference`.
         """
+        print('PREDICTIONS:', [p.shape for p in predictions])
         boxes = self.predict_boxes(predictions, proposals)
         scores = self.predict_probs(predictions, proposals)
         image_shapes = [x.image_size for x in proposals]
@@ -153,5 +155,5 @@ class ModifiedFastRCNNOutputLayers(FastRCNNOutputLayers):
             self.test_score_thresh,
             self.test_nms_thresh,
             self.test_topk_per_image,
-            class_scores_only
+            self.class_scores_only
         )
