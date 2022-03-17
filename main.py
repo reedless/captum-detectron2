@@ -32,9 +32,10 @@ print("Modified model loaded")
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
-      summed_outputs = torch.stack([output.sum(dim=0) for output in outputs])
-      print(summed_outputs.shape)
-      return summed_outputs
+      return outputs[0].sum(dim=0)
+      # summed_outputs = torch.stack([output.sum(dim=0) for output in outputs])
+      # print(summed_outputs.shape)
+      # return summed_outputs
       # result_class_probabilities = []
       # for output in outputs:
       #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
