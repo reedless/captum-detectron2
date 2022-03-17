@@ -33,7 +33,7 @@ def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
       outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
       print(len(outputs))
-      print(outputs[0].size)
+      print(outputs[0].shape)
       return outputs[0].sum(dim=0)
       # summed_outputs = torch.stack([output.sum(dim=0) for output in outputs])
       # print(summed_outputs.shape)
