@@ -37,7 +37,7 @@ def wrapper(input):
             print(outputs[i].shape)
             print(outputs[i].sum(dim=0).unsqueeze(0).shape)
             if outputs[i].shape[0] != 0:
-                  return outputs[i].sum(dim=0)
+                  return outputs[i].sum(dim=0).unsqueeze(0)
       # summed_outputs = torch.stack([output.sum(dim=0) for output in outputs])
       # print(summed_outputs.shape)
       # return summed_outputs
