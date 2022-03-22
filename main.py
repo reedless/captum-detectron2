@@ -10,7 +10,11 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
 
-from modified_rcnn import ModifiedGeneralizedRCNN
+# from modified_rcnn import ModifiedGeneralizedRCNN
+from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
+from modified_image_list import ModifiedImageList
+from types import MethodType
+from typing import List, Dict
 
 img = cv2.imread('000000000001.jpg')
 device = torch.device("cuda")
@@ -24,14 +28,31 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_5
 model = build_model(cfg).to(device).eval()
 # DetectionCheckpointer(model).load(cfg.MODEL.WEIGHTS)
 
-modified = ModifiedGeneralizedRCNN(model).to(device).eval()
+# modified = ModifiedGeneralizedRCNN(model).to(device).eval()
+
+model.roi_heads.box_predictor = ModifiedFastRCNNOutputLayers(model.roi_heads.box_predictor)
+
+def new_preprocess_image(self, batched_inputs: List[Dict[str, torch.Tensor]]):
+      """
+      Normalize, pad and batch the input images.
+      """
+      images = [x.to(self.device) for x in batched_inputs]
+      images = [(x - self.pixel_mean) / self.pixel_std for x in images]
+      images = ModifiedImageList.from_tensors(images, self.backbone.size_divisibility) # Extend ImageList to new object
+      return images
+
+model.preprocess_image = MethodType(new_preprocess_image, model)
+model.roi_heads.forward_with_given_boxes = MethodType(lambda self, x, y: y, model)
+
+modified = model
+
 DetectionCheckpointer(modified).load(cfg.MODEL.WEIGHTS)
 
 print("Modified model loaded")
 
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
-      outputs = modified.inference(input, do_postprocess=False, class_scores_only=True)
+      outputs = modified.forward(input, do_postprocess=False)
       print(len(outputs))
       for i in range(len(outputs)):
             print(outputs[i].shape)
@@ -71,6 +92,8 @@ baseline_dist = torch.randn(5, 3, 480, 640).to(device) * 0.001
 outputs = modified.inference(input_)
 
 print(outputs[0]['instances'].pred_classes.unique())
+
+modified.roi_heads.box_predictor.class_scores_only = True
 
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print(("Selecting instance prediction of "
