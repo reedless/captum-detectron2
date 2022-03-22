@@ -14,10 +14,11 @@ from detectron2.modeling import build_model
 from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
 from modified_image_list import ModifiedImageList
 from types import MethodType
-from typing import List, Dict
+from typing import List
 
 img = cv2.imread('000000000001.jpg')
 device = torch.device("cuda")
+# device = torch.device("cpu")
 
 # build and load faster rcnn model
 cfg = get_cfg()
@@ -32,7 +33,7 @@ model = build_model(cfg).to(device).eval()
 
 model.roi_heads.box_predictor = ModifiedFastRCNNOutputLayers(model.roi_heads.box_predictor)
 
-def new_preprocess_image(self, batched_inputs: List[Dict[str, torch.Tensor]]):
+def new_preprocess_image(self, batched_inputs: List[torch.Tensor]):
       """
       Normalize, pad and batch the input images.
       """
@@ -41,18 +42,36 @@ def new_preprocess_image(self, batched_inputs: List[Dict[str, torch.Tensor]]):
       images = ModifiedImageList.from_tensors(images, self.backbone.size_divisibility) # Extend ImageList to new object
       return images
 
+def _new_postprocess(instances, batched_inputs: List[torch.Tensor], image_sizes):
+        """
+        Rescale the output instances to the target size.
+        """
+        # note: private function; subject to changes
+        processed_results = []
+        for results_per_image, input_per_image, image_size in zip(
+            instances, batched_inputs, image_sizes
+        ):
+            height = image_size[0]
+            width = image_size[1]
+            from detectron2.modeling.postprocessing import detector_postprocess
+            r = detector_postprocess(results_per_image, height, width)
+            processed_results.append({"instances": r})
+        return processed_results
+
 model.preprocess_image = MethodType(new_preprocess_image, model)
+model.__class__._postprocess = _new_postprocess
 model.roi_heads.forward_with_given_boxes = MethodType(lambda self, x, y: y, model)
 
 modified = model
 
 DetectionCheckpointer(modified).load(cfg.MODEL.WEIGHTS)
+modified.to(device)
 
 print("Modified model loaded")
 
 def wrapper(input):
       # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
-      outputs = modified.forward(input, do_postprocess=False)
+      outputs = modified.inference(input, do_postprocess=False)
       print(len(outputs))
       for i in range(len(outputs)):
             print(outputs[i].shape)
