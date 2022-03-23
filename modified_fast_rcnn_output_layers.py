@@ -106,14 +106,19 @@ def fast_rcnn_inference_single_image(
     boxes, scores, filter_inds, class_scores = boxes[keep], scores[keep], filter_inds[keep], class_scores[keep]
 
     if class_scores_only:
+        # try detaching here?
+        boxes = boxes.detach()
+        scores = scores.detach()
+        filter_inds = filter_inds.detach()
+
         # class_scores: tensor[N x K]
         return class_scores, filter_inds[:, 0]
 
     result = Instances(image_shape)
-    result.pred_boxes = Boxes(boxes.detach())
-    result.scores = scores.detach()
+    result.pred_boxes = Boxes(boxes)
+    result.scores = scores
     result.class_scores = class_scores
-    result.pred_classes = filter_inds[:, 1].detach()
+    result.pred_classes = filter_inds[:, 1]
 
     return result, filter_inds[:, 0]
 
