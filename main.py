@@ -33,21 +33,23 @@ model = build_model(cfg).to(device).eval()
 
 model.roi_heads.box_predictor = ModifiedFastRCNNOutputLayers(model.roi_heads.box_predictor)
 
-def new_preprocess_image(self, batched_inputs: List[torch.Tensor]):
+def new_preprocess_image(self, batched_inputs: torch.Tensor):
       """
       Normalize, pad and batch the input images.
       """
+      print(type(batched_inputs))
       images = [x.to(self.device) for x in batched_inputs]
       images = [(x - self.pixel_mean) / self.pixel_std for x in images]
       images = ModifiedImageList.from_tensors(images, self.backbone.size_divisibility) # Extend ImageList to new object
       return images
 
-def _new_postprocess(instances, batched_inputs: List[torch.Tensor], image_sizes):
+def _new_postprocess(instances, batched_inputs: torch.Tensor, image_sizes):
         """
         Rescale the output instances to the target size.
         """
         # note: private function; subject to changes
         processed_results = []
+        print(type(batched_inputs))
         for results_per_image, input_per_image, image_size in zip(
             instances, batched_inputs, image_sizes
         ):
