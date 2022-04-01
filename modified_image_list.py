@@ -57,13 +57,20 @@ class ModifiedImageList(ImageList):
             batched_imgs = F.pad(tensors[0], padding_size, value=pad_value).unsqueeze_(0)
         else:
             print("Inside ModifiedImageList.from_tensors")
-            print(len(tensors)) # N, C, H, W
+            print(len(tensors))
+
             # max_size can be a tensor in tracing mode, therefore convert to list
             batch_shape = [len(tensors)] + list(tensors[0].shape[:-2]) + list(max_size)
-            print(batch_shape, pad_value)
 
-            # if pad_value == 0.0:
-            #     return ModifiedImageList(torch.stack(tensors).contiguous(), image_sizes)
+            '''
+            basically what's happening here is padding the list of all images into the same max_size
+            so that we can pass a N, C, H, W tensor to the model
+            technically we would not face this issue as we are alreadying passing a N, C, H, W tensor
+            right from the start, this step is to compensate for allowing training to occur using
+            detectron2 abstractions, i.e. a dict w 'image' as one of the keys
+            '''
+
+            print(batch_shape, pad_value)
 
             batched_imgs = tensors[0].new_full(batch_shape, pad_value)
             print(tensors[0].shape)
