@@ -4,7 +4,7 @@ import cv2
 import torch
 from captum.attr import (DeepLift, DeepLiftShap, GradientShap,
                          IntegratedGradients, LayerConductance,
-                         NeuronConductance, NoiseTunnel)
+                         NeuronConductance, NoiseTunnel, LayerGradientXActivation)
 from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
@@ -71,38 +71,20 @@ modified.to(device)
 
 print("Modified model loaded")
 
-def wrapper(input):
-      # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
-      outputs = modified.inference(input, do_postprocess=False)
-      print(len(outputs))
-      for i in range(len(outputs)):
-            print(outputs[i].shape)
-            print(outputs[i].sum(dim=0).unsqueeze(0).shape)
-            if outputs[i].shape[0] != 0:
-                  return outputs[i].sum(dim=0).unsqueeze(0)
-      # summed_outputs = torch.stack([output.sum(dim=0) for output in outputs])
-      # print(summed_outputs.shape)
-      # return summed_outputs
-      # result_class_probabilities = []
-      # for output in outputs:
-      #       result_class_probabilities.append(output['instances'].class_scores.sum(dim=0))
+class WrapperModel(torch.nn.Module):
+      def __init__(self):
+            super().__init__()
+            self.model = modified
 
-      # for i in range(len(outputs)): # for each input image
-      #       if len(outputs[i]["instances"]) > 0: # instances detected
-      #             pred_classes = outputs[i]["instances"].pred_classes
-      #             if selected_class in pred_classes:
-      #                   # pick first occurance of selected class
-      #                   for j in range(len(pred_classes)):
-      #                         if pred_classes[j] == selected_class:
-      #                               result_class_probabilities.append(outputs[i]["instances"].class_scores[j])
-      #                               break
-      #             else:
-      #                   result_class_probabilities.append(outputs[i]["instances"].class_scores[0])
-      #       else:
-      #             # if no instances are detected, return 0.0 for all classes
-      #             result_class_probabilities.append(torch.tensor([0.0 for _ in range(total_classes)]).to(device))
-                  
-      # return torch.stack(result_class_probabilities)
+      def forward(self, input):
+            # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
+            outputs = self.model.inference(input, do_postprocess=False)
+            print(len(outputs), outputs)
+            for i in range(len(outputs)):
+                  print('lll: ', outputs[i])
+                  print('hiii', outputs[i].sum(dim=0).unsqueeze(0).shape)
+                  if outputs[i].shape[0] != 0:
+                        return outputs[i].sum(dim=0).unsqueeze(0)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
@@ -115,6 +97,7 @@ outputs = modified.inference(input_)
 print(outputs[0]['instances'].pred_classes.unique())
 
 modified.roi_heads.box_predictor.class_scores_only = True
+wrapper_model = WrapperModel()
 
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print(("Selecting instance prediction of "
@@ -126,14 +109,15 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # wrapper_partial = partial(wrapper, 
       #                           selected_class = outputs[0]['instances'][0].pred_classes[i], 
       #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
-      ig = IntegratedGradients(wrapper)
-      attributions, delta = ig.attribute(input_, 
-                                         target=pred_class, 
-                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
-                                    #                                 len(outputs[0]['instances'].class_scores[0])),
-                                         return_convergence_delta=True)
+      lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone) 
+      attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
+      # attributions, delta = ig.attribute(input_, 
+      #                                    target=pred_class, 
+      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
+      #                                    return_convergence_delta=True)
       print('IG Attributions:', attributions)
-      print('Convergence Delta:', delta)
+      # print('Convergence Delta:', delta)
 
 
       # # Gradient SHAP
