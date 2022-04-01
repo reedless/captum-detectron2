@@ -1,5 +1,3 @@
-from functools import partial
-
 import cv2
 import torch
 from captum.attr import (DeepLift, DeepLiftShap, GradientShap,
@@ -14,7 +12,6 @@ from detectron2.modeling import build_model
 from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
 from modified_image_list import ModifiedImageList
 from types import MethodType
-from typing import List
 
 img = cv2.imread('000000000001.jpg')
 device = torch.device("cuda")

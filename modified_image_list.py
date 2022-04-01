@@ -56,11 +56,19 @@ class ModifiedImageList(ImageList):
             padding_size = [0, max_size[-1] - image_size[1], 0, max_size[-2] - image_size[0]]
             batched_imgs = F.pad(tensors[0], padding_size, value=pad_value).unsqueeze_(0)
         else:
+            print("Inside ModifiedImageList.from_tensors")
+            print(len(tensors)) # N, C, H, W
             # max_size can be a tensor in tracing mode, therefore convert to list
             batch_shape = [len(tensors)] + list(tensors[0].shape[:-2]) + list(max_size)
-            batched_imgs = tensors[0].new_full(batch_shape, pad_value) # TODO: Remove new tensor creation
+            print(batch_shape, pad_value)
+
+            # if pad_value == 0.0:
+            #     return ModifiedImageList(torch.stack(tensors).contiguous(), image_sizes)
+
+            batched_imgs = tensors[0].new_full(batch_shape, pad_value)
+            print(tensors[0].shape)
+            print(batched_imgs.shape)
             for img, pad_img in zip(tensors, batched_imgs):
-                # just add detach to pad_img
-                pad_img.detach()[..., :img.shape[-2], :img.shape[-1]].copy_(img)
+                pad_img[..., :img.shape[-2], :img.shape[-1]].copy_(img)
 
         return ModifiedImageList(batched_imgs.contiguous(), image_sizes)
