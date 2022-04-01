@@ -102,19 +102,20 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       #       "score {} probability.".format(outputs[0]['instances'].pred_classes[i], outputs[0]['instances'].scores[i])
       #       ))
 
+      # # LayerGradientXActivation
+      # lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone) 
+      # attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
+      # print('LayerGradientXActivation Attributions:', attributions)
+
       # Integrated Gradients
-      # wrapper_partial = partial(wrapper, 
-      #                           selected_class = outputs[0]['instances'][0].pred_classes[i], 
-      #                           total_classes  = len(outputs[0]['instances'].class_scores[0]))
-      lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone) 
-      attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
-      # attributions, delta = ig.attribute(input_, 
-      #                                    target=pred_class, 
-      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
-      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
-      #                                    return_convergence_delta=True)
-      print('IG Attributions:', attributions)
-      # print('Convergence Delta:', delta)
+      wrapper = WrapperModel()
+      ig = IntegratedGradients(wrapper)
+      attributions, delta = ig.attribute(input_, 
+                                         target=pred_class, 
+                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+                                    #                                 len(outputs[0]['instances'].class_scores[0])),
+                                         return_convergence_delta=True)
+      print('Convergence Delta:', delta)
 
 
       # # Gradient SHAP
