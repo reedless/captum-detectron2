@@ -59,8 +59,6 @@ class ModifiedImageList(ImageList):
             print("Inside ModifiedImageList.from_tensors")
             print(len(tensors)) # N, C, H, W
             # max_size can be a tensor in tracing mode, therefore convert to list
-            batch_shape = [len(tensors)] + list(tensors[0].shape[:-2]) + list(max_size)
-            print(batch_shape, pad_value)
 
             images_list = []
             for i in range(len(tensors)):

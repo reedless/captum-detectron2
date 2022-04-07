@@ -20,7 +20,7 @@ device = torch.device("cuda")
 # build and load faster rcnn model
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 
 model = build_model(cfg).to(device).eval()
@@ -82,6 +82,9 @@ class WrapperModel(torch.nn.Module):
                   print('hiii', outputs[i].sum(dim=0).unsqueeze(0).shape)
                   if outputs[i].shape[0] != 0:
                         return outputs[i].sum(dim=0).unsqueeze(0)
+                  else:
+                        return torch.cat([outputs[i],
+                                          torch.zeros((1, outputs[i].shape[1])).to(device)])
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
@@ -97,22 +100,18 @@ modified.roi_heads.box_predictor.class_scores_only = True
 wrapper_model = WrapperModel()
 
 for pred_class in outputs[0]['instances'].pred_classes.unique():
-      # print(("Selecting instance prediction of "
-      #       "class {} with "
-      #       "score {} probability.".format(outputs[0]['instances'].pred_classes[i], outputs[0]['instances'].scores[i])
-      #       ))
+      wrapper = WrapperModel()
 
       # # LayerGradientXActivation
-      # lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone) 
+      # lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone)
       # attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
       # print('LayerGradientXActivation Attributions:', attributions)
 
       # Integrated Gradients
-      wrapper = WrapperModel()
       ig = IntegratedGradients(wrapper)
-      attributions, delta = ig.attribute(input_, 
-                                         target=pred_class, 
-                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i], 
+      attributions, delta = ig.attribute(input_,
+                                         target=pred_class,
+                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
                                     #                                 len(outputs[0]['instances'].class_scores[0])),
                                          return_convergence_delta=True)
       print('Convergence Delta:', delta)
@@ -120,14 +119,14 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
 
       # # Gradient SHAP
       # gs = GradientShap(wrapper)
-
+      #
       # # We define a distribution of baselines and draw `n_samples` from that
       # # distribution in order to estimate the expectations of gradients across all baselines
       # attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
       #                               target=pred_class, return_convergence_delta=True)
       # print('GradientShap Attributions:', attributions)
       # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      # print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
 
       # # Deep Lift
@@ -166,4 +165,3 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # attributions, delta = lc.attribute(input_, baselines=baseline, target=0, return_convergence_delta=True)
       # print('Layer Attributions:', attributions)
       # print('Convergence Delta:', delta)
-
