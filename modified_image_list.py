@@ -59,9 +59,6 @@ class ModifiedImageList(ImageList):
             print("Inside ModifiedImageList.from_tensors")
             print(len(tensors))
 
-            # max_size can be a tensor in tracing mode, therefore convert to list
-            batch_shape = [len(tensors)] + list(tensors[0].shape[:-2]) + list(max_size)
-
             '''
             basically what's happening here is padding the list of all images into the same max_size
             so that we can pass a N, C, H, W tensor to the model
@@ -70,12 +67,15 @@ class ModifiedImageList(ImageList):
             detectron2 abstractions, i.e. a dict w 'image' as one of the keys
             '''
 
-            print(batch_shape, pad_value)
+            # TODO: since we are copying the above code almost directly (except compensating for a for loop)
+            #       maybe dont need to check for len(tensors) == 1? can merge or nah?
 
-            batched_imgs = tensors[0].new_full(batch_shape, pad_value)
-            print(tensors[0].shape)
-            print(batched_imgs.shape)
-            for img, pad_img in zip(tensors, batched_imgs):
-                pad_img[..., :img.shape[-2], :img.shape[-1]].copy_(img)
+            images_list = []
+            for i in range(len(tensors)):
+                image_size = image_sizes[i]
+                padding_size = [0, max_size[-1] - image_size[1], 0, max_size[-2] - image_size[0]]
+                padded_img = F.pad(tensors[i], padding_size, value=pad_value).unsqueeze_(0)
+                images_list.append(padded_img)
+            batched_imgs = torch.stack(images_list)
 
         return ModifiedImageList(batched_imgs.contiguous(), image_sizes)

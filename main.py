@@ -82,6 +82,8 @@ class WrapperModel(torch.nn.Module):
                   print('hiii', outputs[i].sum(dim=0).unsqueeze(0).shape)
                   if outputs[i].shape[0] != 0:
                         return outputs[i].sum(dim=0).unsqueeze(0)
+                  else:
+                        
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
