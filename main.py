@@ -107,16 +107,16 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
       # print('LayerGradientXActivation Attributions:', attributions)
 
-      # Integrated Gradients
-      ig = IntegratedGradients(wrapper)
-      attributions, delta = ig.attribute(input_,
-                                         target=pred_class,
-                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
-                                    #                                 len(outputs[0]['instances'].class_scores[0])),
-                                         return_convergence_delta=True)
-      print('Convergence Delta:', delta)
-
-
+      # # Integrated Gradients
+      # ig = IntegratedGradients(wrapper)
+      # attributions, delta = ig.attribute(input_,
+      #                                    target=pred_class,
+      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
+      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
+      #                                    return_convergence_delta=True)
+      # print('Convergence Delta:', delta)
+      #
+      #
       # # Gradient SHAP
       # gs = GradientShap(wrapper)
       #
@@ -127,14 +127,29 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('GradientShap Attributions:', attributions)
       # print('Convergence Delta:', delta)
       # print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
-
-
+      #
+      #
       # # Deep Lift
       # dl = DeepLift(wrapper)
       # attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
       # print('DeepLift Attributions:', attributions)
       # print('Convergence Delta:', delta)
 
+      '''
+      File "main.py", line 134, in <module>
+        attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
+      File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
+        return func(*args, **kwargs)
+      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 347, in attribute
+        gradients = self.gradient_func(wrapped_forward_func, inputs)
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 111, in compute_gradients
+        outputs = _run_forward(forward_fn, inputs, target_ind, additional_forward_args)
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 448, in _run_forward
+        output = forward_func()
+      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 390, in forward_fn
+        torch.cat((model_out[:, 0], model_out[:, 1])), target
+      IndexError: index 1 is out of bounds for dimension 1 with size 1
+      '''
 
       # # Deep Lift SHAP
       # dl = DeepLiftShap(wrapper)
@@ -143,6 +158,23 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('Convergence Delta:', delta)
       # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
+      '''
+          File "main.py", line 156, in <module>
+            attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+          File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
+            return func(*args, **kwargs)
+          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 845, in attribute
+            custom_attribution_func=custom_attribution_func,
+          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 347, in attribute
+            gradients = self.gradient_func(wrapped_forward_func, inputs)
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 111, in compute_gradients
+            outputs = _run_forward(forward_fn, inputs, target_ind, additional_forward_args)
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 448, in _run_forward
+            output = forward_func()
+          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 390, in forward_fn
+            torch.cat((model_out[:, 0], model_out[:, 1])), target
+        IndexError: index 1 is out of bounds for dimension 1 with size 1
+      '''
 
       # # Noise Tunnel + Integrated Gradients
       # ig = IntegratedGradients(wrapper)
@@ -153,11 +185,45 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('Convergence Delta:', delta)
       # print('Average delta per example', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
+      '''
+      RuntimeError: CUDA out of memory. Tried to allocate 3.66 GiB (GPU 0; 31.71 GiB total capacity;
+      23.53 GiB already allocated; 1.48 GiB free; 28.27 GiB reserved in total by PyTorch)
+      '''
 
       # # Neuron Conductance
       # nc = NeuronConductance(wrapper, model.backbone)
       # attributions = nc.attribute(input_, neuron_selector=1, target=0)
       # print('Neuron Attributions:', attributions)
+
+      '''
+          File "main.py", line 196, in <module>
+            attributions = nc.attribute(input_, neuron_selector=1, target=0)
+          File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
+            return func(*args, **kwargs)
+          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/neuron/neuron_conductance.py", line 313, in attribute
+            attribute_to_neuron_input=attribute_to_neuron_input,
+          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/neuron/neuron_conductance.py", line 373, in _attribute
+            attribute_to_layer_input=attribute_to_neuron_input,
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 599, in compute_layer_gradients_and_eval
+            require_layer_grads=True,
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 297, in _forward_layer_distributed_eval
+            additional_forward_args=additional_forward_args,
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 459, in _run_forward
+            else inputs
+          File "/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py", line 889, in _call_impl
+            result = self.forward(*input, **kwargs)
+          File "main.py", line 78, in forward
+            outputs = self.model.inference(input, do_postprocess=False)
+          File "/usr/local/lib/python3.6/dist-packages/detectron2/modeling/meta_arch/rcnn.py", line 200, in inference
+            features = self.backbone(images.tensor)
+          File "/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py", line 893, in _call_impl
+            hook_result = hook(self, input, result)
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 261, in forward_hook
+            apply_gradient_requirements(eval_tsrs, warn=False)
+          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 39, in apply_gradient_requirements
+            assert isinstance(input, torch.Tensor), "Given input is not a torch.Tensor"
+        AssertionError: Given input is not a torch.Tensor
+      '''
 
 
       # # Layer Conductance
@@ -165,3 +231,33 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # attributions, delta = lc.attribute(input_, baselines=baseline, target=0, return_convergence_delta=True)
       # print('Layer Attributions:', attributions)
       # print('Convergence Delta:', delta)
+
+      '''
+      File "main.py", line 231, in <module>
+        attributions, delta = lc.attribute(input_, baselines=baseline, target=0, return_convergence_delta=True)
+      File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
+        return func(*args, **kwargs)
+      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/layer/layer_conductance.py", line 298, in attribute
+        attribute_to_layer_input=attribute_to_layer_input,
+      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/layer/layer_conductance.py", line 366, in _attribute
+        attribute_to_layer_input=attribute_to_layer_input,
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 599, in compute_layer_gradients_and_eval
+        require_layer_grads=True,
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 297, in _forward_layer_distributed_eval
+        additional_forward_args=additional_forward_args,
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 459, in _run_forward
+        else inputs
+      File "/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py", line 889, in _call_impl
+        result = self.forward(*input, **kwargs)
+      File "main.py", line 78, in forward
+        outputs = self.model.inference(input, do_postprocess=False)
+      File "/usr/local/lib/python3.6/dist-packages/detectron2/modeling/meta_arch/rcnn.py", line 200, in inference
+        features = self.backbone(images.tensor)
+      File "/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py", line 893, in _call_impl
+        hook_result = hook(self, input, result)
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 261, in forward_hook
+        apply_gradient_requirements(eval_tsrs, warn=False)
+      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 39, in apply_gradient_requirements
+        assert isinstance(input, torch.Tensor), "Given input is not a torch.Tensor"
+      AssertionError: Given input is not a torch.Tensor
+      '''
