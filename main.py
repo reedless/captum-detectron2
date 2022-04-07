@@ -76,7 +76,7 @@ class WrapperModel(torch.nn.Module):
       def forward(self, input):
             # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
             outputs = self.model.inference(input, do_postprocess=False)
-            print(len(outputs), outputs)
+            # print(len(outputs), outputs)
             for i in range(len(outputs)):
                   print('lll: ', outputs[i])
                   print('hiii', outputs[i].sum(dim=0).unsqueeze(0).shape)
