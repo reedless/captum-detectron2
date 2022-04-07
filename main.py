@@ -102,33 +102,34 @@ wrapper_model = WrapperModel()
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       wrapper = WrapperModel()
 
-      # # LayerGradientXActivation
-      # lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone)
-      # attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
-      # print('LayerGradientXActivation Attributions:', attributions)
+      # LayerGradientXActivation
+      lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone)
+      attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
+      print('LayerGradientXActivation Attributions:', attributions)
 
-      # # Integrated Gradients
-      # ig = IntegratedGradients(wrapper)
-      # attributions, delta = ig.attribute(input_,
-      #                                    target=pred_class,
-      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
-      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
-      #                                    return_convergence_delta=True)
-      # print('Convergence Delta:', delta)
-      #
-      #
-      # # Gradient SHAP
-      # gs = GradientShap(wrapper)
-      #
-      # # We define a distribution of baselines and draw `n_samples` from that
-      # # distribution in order to estimate the expectations of gradients across all baselines
-      # attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
-      #                               target=pred_class, return_convergence_delta=True)
-      # print('GradientShap Attributions:', attributions)
-      # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
-      #
-      #
+
+      # Integrated Gradients
+      ig = IntegratedGradients(wrapper)
+      attributions, delta = ig.attribute(input_,
+                                         target=pred_class,
+                                    #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
+                                    #                                 len(outputs[0]['instances'].class_scores[0])),
+                                         return_convergence_delta=True)
+      print('Convergence Delta:', delta)
+
+
+      # Gradient SHAP
+      gs = GradientShap(wrapper)
+
+      # We define a distribution of baselines and draw `n_samples` from that
+      # distribution in order to estimate the expectations of gradients across all baselines
+      attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
+                                    target=pred_class, return_convergence_delta=True)
+      print('GradientShap Attributions:', attributions)
+      print('Convergence Delta:', delta)
+      print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
+
+
       # # Deep Lift
       # dl = DeepLift(wrapper)
       # attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
