@@ -58,7 +58,17 @@ class ModifiedImageList(ImageList):
         else:
             print("Inside ModifiedImageList.from_tensors")
             print(len(tensors)) # N, C, H, W
-            # max_size can be a tensor in tracing mode, therefore convert to list
+            
+            '''
+            basically what's happening here is padding the list of all images into the same max_size
+            so that we can pass a N, C, H, W tensor to the model
+            technically we would not face this issue as we are alreadying passing a N, C, H, W tensor
+            right from the start, this step is to compensate for allowing training to occur using
+            detectron2 abstractions, i.e. a dict w 'image' as one of the keys
+            '''
+
+            # TODO: since we are copying the above code almost directly (except compensating for a for loop)
+            #       maybe dont need to check for len(tensors) == 1? can merge or nah?
 
             images_list = []
             for i in range(len(tensors)):
