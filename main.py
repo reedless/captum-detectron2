@@ -100,10 +100,7 @@ modified.roi_heads.box_predictor.class_scores_only = True
 wrapper_model = WrapperModel()
 
 for pred_class in outputs[0]['instances'].pred_classes.unique():
-      # print(("Selecting instance prediction of "
-      #       "class {} with "
-      #       "score {} probability.".format(outputs[0]['instances'].pred_classes[i], outputs[0]['instances'].scores[i])
-      #       ))
+      wrapper = WrapperModel()
 
       # # LayerGradientXActivation
       # lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone) 
@@ -111,7 +108,6 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # print('LayerGradientXActivation Attributions:', attributions)
 
       # Integrated Gradients
-      wrapper = WrapperModel()
       ig = IntegratedGradients(wrapper)
       attributions, delta = ig.attribute(input_, 
                                          target=pred_class, 
@@ -130,7 +126,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       #                               target=pred_class, return_convergence_delta=True)
       # print('GradientShap Attributions:', attributions)
       # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      # print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
 
       # # Deep Lift
