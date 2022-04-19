@@ -1,0 +1,60 @@
+Modified model loaded
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+tensor([ 2,  7, 12], device='cuda:0')
+Inside ModifiedImageList.from_tensors
+50
+PREDICTIONS: [torch.Size([50000, 81]), torch.Size([50000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+Integrated Gradients Convergence Delta: tensor([-0.8663], device='cuda:0', dtype=torch.float64)
+31.358184078966648 (480, 640)
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+GradientShap Convergence Delta: tensor([-0.9901, -1.0061, -0.9867, -0.9921], device='cuda:0')
+GradientShap Average Delta per example: tensor([-0.9937], device='cuda:0')
+10.235206 (480, 640)
+Inside ModifiedImageList.from_tensors
+50
+PREDICTIONS: [torch.Size([50000, 81]), torch.Size([50000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+Integrated Gradients Convergence Delta: tensor([-0.9179], device='cuda:0', dtype=torch.float64)
+18.538262992727685 (480, 640)
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+GradientShap Convergence Delta: tensor([-0.9974, -0.9981, -0.9930, -0.9939], device='cuda:0')
+GradientShap Average Delta per example: tensor([-0.9956], device='cuda:0')
+10.407973 (480, 640)
+Inside ModifiedImageList.from_tensors
+50
+PREDICTIONS: [torch.Size([50000, 81]), torch.Size([50000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+Integrated Gradients Convergence Delta: tensor([-0.8051], device='cuda:0', dtype=torch.float64)
+26.137336854193702 (480, 640)
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+Inside ModifiedImageList.from_tensors
+4
+PREDICTIONS: [torch.Size([4000, 81]), torch.Size([4000, 320])]
+GradientShap Convergence Delta: tensor([-1.0103, -1.0160, -1.0194, -0.9804], device='cuda:0')
+GradientShap Average Delta per example: tensor([-1.0065], device='cuda:0')
+20.918276 (480, 640)
