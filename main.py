@@ -21,7 +21,7 @@ device = torch.device("cuda")
 # build and load faster rcnn model
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 
 model = build_model(cfg).to(device).eval()
@@ -111,6 +111,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
                                          return_convergence_delta=True)
       print('Integrated Gradients Convergence Delta:', delta)
 
+      attributions = attributions.cpu().numpy()
       fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
       axs[0, 0].set_title('Attribution mask')
       axs[0, 0].imshow(attributions, cmap='BuPu')
