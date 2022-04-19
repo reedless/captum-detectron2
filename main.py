@@ -119,7 +119,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       axs[0, 0].axis('off')
       axs[0, 1].set_title('Overlay IG on Input image ')
       axs[0, 1].imshow(attributions, cmap='BuPu')
-      axs[0, 1].imshow(input_, alpha=0.5)
+      axs[0, 1].imshow(img, alpha=0.5)
       axs[0, 1].axis('off')
       plt.tight_layout()
       plt.savefig(f'IG_mask_{pred_class}.png', bbox_inches='tight')      
