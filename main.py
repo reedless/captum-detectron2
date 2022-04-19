@@ -7,6 +7,7 @@ from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
+import matplotlib.pyplot as plt
 
 # from modified_rcnn import ModifiedGeneralizedRCNN
 from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
@@ -34,7 +35,7 @@ def new_preprocess_image(self, batched_inputs: torch.Tensor):
       """
       Normalize, pad and batch the input images.
       """
-      print(type(batched_inputs))
+      # print(type(batched_inputs))
       images = [x.to(self.device) for x in batched_inputs]
       images = [(x - self.pixel_mean) / self.pixel_std for x in images]
       images = ModifiedImageList.from_tensors(images, self.backbone.size_divisibility) # Extend ImageList to new object
@@ -46,7 +47,7 @@ def _new_postprocess(instances, batched_inputs: torch.Tensor, image_sizes):
         """
         # note: private function; subject to changes
         processed_results = []
-        print(type(batched_inputs))
+        # print(type(batched_inputs))
         for results_per_image, input_per_image, image_size in zip(
             instances, batched_inputs, image_sizes
         ):
@@ -76,15 +77,14 @@ class WrapperModel(torch.nn.Module):
       def forward(self, input):
             # just sum all the scores as per https://captum.ai/tutorials/Segmentation_Interpret
             outputs = self.model.inference(input, do_postprocess=False)
-            # print(len(outputs), outputs)
+            acc = []
             for i in range(len(outputs)):
-                  print('lll: ', outputs[i])
-                  print('hiii', outputs[i].sum(dim=0).unsqueeze(0).shape)
                   if outputs[i].shape[0] != 0:
-                        return outputs[i].sum(dim=0).unsqueeze(0)
+                        acc.append(outputs[i].sum(dim=0).unsqueeze(0))
                   else:
-                        return torch.cat([outputs[i],
-                                          torch.zeros((1, outputs[i].shape[1])).to(device)])
+                        acc.append(torch.cat([outputs[i],
+                                          torch.zeros((1, outputs[i].shape[1])).to(device)]))
+            return torch.cat(acc)
 
 # define input and baseline
 input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
@@ -102,12 +102,6 @@ wrapper_model = WrapperModel()
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       wrapper = WrapperModel()
 
-      # LayerGradientXActivation
-      lg = LayerGradientXActivation(wrapper_model, wrapper_model.model.backbone)
-      attributions = lg.attribute(input_, target=pred_class, attribute_to_layer_input=True)
-      print('LayerGradientXActivation Attributions:', attributions)
-
-
       # Integrated Gradients
       ig = IntegratedGradients(wrapper)
       attributions, delta = ig.attribute(input_,
@@ -115,8 +109,18 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
                                     #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
                                     #                                 len(outputs[0]['instances'].class_scores[0])),
                                          return_convergence_delta=True)
-      print('Convergence Delta:', delta)
+      print('Integrated Gradients Convergence Delta:', delta)
 
+      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      axs[0, 0].set_title('Attribution mask')
+      axs[0, 0].imshow(attributions, cmap='BuPu')
+      axs[0, 0].axis('off')
+      axs[0, 1].set_title('Overlay IG on Input image ')
+      axs[0, 1].imshow(attributions, cmap='BuPu')
+      axs[0, 1].imshow(input_, alpha=0.5)
+      axs[0, 1].axis('off')
+      plt.tight_layout()
+      plt.savefig(f'IG_mask_{pred_class}.png', bbox_inches='tight')      
 
       # Gradient SHAP
       gs = GradientShap(wrapper)
@@ -125,9 +129,9 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # distribution in order to estimate the expectations of gradients across all baselines
       attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
                                     target=pred_class, return_convergence_delta=True)
-      print('GradientShap Attributions:', attributions)
-      print('Convergence Delta:', delta)
-      print('Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
+
+      print('GradientShap Convergence Delta:', delta)
+      print('GradientShap Average Delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
 
       # # Deep Lift
