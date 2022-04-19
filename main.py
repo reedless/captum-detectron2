@@ -111,7 +111,8 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
                                          return_convergence_delta=True)
       print('Integrated Gradients Convergence Delta:', delta)
 
-      attributions = attributions.cpu().numpy()
+      attributions = attributions[0].permute(1,2,0).cpu().numpy()
+
       fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
       axs[0, 0].set_title('Attribution mask')
       axs[0, 0].imshow(attributions, cmap='BuPu')
