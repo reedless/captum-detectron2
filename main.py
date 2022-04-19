@@ -126,16 +126,16 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       plt.tight_layout()
       plt.savefig(f'IG_mask_{pred_class}.png', bbox_inches='tight')      
 
-      # Gradient SHAP
-      gs = GradientShap(wrapper)
+      # # Gradient SHAP
+      # gs = GradientShap(wrapper)
 
-      # We define a distribution of baselines and draw `n_samples` from that
-      # distribution in order to estimate the expectations of gradients across all baselines
-      attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
-                                    target=pred_class, return_convergence_delta=True)
+      # # We define a distribution of baselines and draw `n_samples` from that
+      # # distribution in order to estimate the expectations of gradients across all baselines
+      # attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
+      #                               target=pred_class, return_convergence_delta=True)
 
-      print('GradientShap Convergence Delta:', delta)
-      print('GradientShap Average Delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
+      # print('GradientShap Convergence Delta:', delta)
+      # print('GradientShap Average Delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
 
       # # Deep Lift
