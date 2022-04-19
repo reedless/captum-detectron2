@@ -22,7 +22,7 @@ device = torch.device("cuda")
 # build and load faster rcnn model
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.9
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml")
 
 model = build_model(cfg).to(device).eval()
