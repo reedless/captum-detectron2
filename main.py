@@ -8,6 +8,7 @@ from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
 from detectron2.modeling import build_model
 import matplotlib.pyplot as plt
+import numpy as np
 
 # from modified_rcnn import ModifiedGeneralizedRCNN
 from modified_fast_rcnn_output_layers import ModifiedFastRCNNOutputLayers
@@ -112,7 +113,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       print('Integrated Gradients Convergence Delta:', delta)
 
       attributions = attributions[0].permute(1,2,0).cpu().numpy()
-      print(torch.sum(attributions), attributions.shape)
+      print(np.sum(attributions), attributions.shape)
 
       fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
       axs[0, 0].set_title('Attribution mask')
