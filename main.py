@@ -113,6 +113,8 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       print('Integrated Gradients Convergence Delta:', delta)
 
       attributions = attributions[0].permute(1,2,0).cpu().numpy()
+      attributions = np.sum(np.abs(attributions), axis=-1)
+
       print(np.sum(attributions), attributions.shape)
 
       fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
