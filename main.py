@@ -88,8 +88,8 @@ class WrapperModel(torch.nn.Module):
             return torch.cat(acc)
 
 # define input and baseline
-input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device)
-baseline = torch.zeros(input_.shape).to(device)
+input_   = torch.from_numpy(img).permute(2,0,1).unsqueeze(0).to(device).type(torch.cuda.FloatTensor)
+baseline = torch.zeros(input_.shape).to(device).type(torch.cuda.FloatTensor)
 baseline_dist = torch.randn(5, 3, 480, 640).to(device) * 0.001
 
 # run input through modified model to get number of instances
