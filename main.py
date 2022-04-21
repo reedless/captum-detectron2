@@ -106,120 +106,25 @@ wrapper_model = WrapperModel()
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       wrapper = WrapperModel()
 
-      # # Integrated Gradients
-      # ig = IntegratedGradients(wrapper)
-      # attributions, delta = ig.attribute(input_,
-      #                                    target=pred_class,
-      #                               #      additional_forward_args = (outputs[0]['instances'][0].pred_classes[i],
-      #                               #                                 len(outputs[0]['instances'].class_scores[0])),
-      #                                    return_convergence_delta=True)
-      # print('Integrated Gradients Convergence Delta:', delta)
+      # Saliency
+      saliency = Saliency(wrapper)
+      attribution = saliency.attribute(input_, target=pred_class)
 
-      # attributions = attributions[0].permute(1,2,0).cpu().numpy()
-      # attributions = np.sum(np.abs(attributions), axis=-1)
+      attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
+      attributions = np.sum(np.abs(attributions), axis=-1)
 
-      # print(np.sum(attributions), attributions.shape)
+      print(np.sum(attributions), attributions.shape)
 
-      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      # axs[0, 0].set_title('Attribution mask')
-      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 0].axis('off')
-      # axs[0, 1].set_title('Overlay IG on Input image ')
-      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 1].imshow(img, alpha=0.5)
-      # axs[0, 1].axis('off')
-      # plt.tight_layout()
-      # plt.savefig(f'IG_mask_{pred_class}.png', bbox_inches='tight')      
-
-      # # Gradient SHAP
-      # gs = GradientShap(wrapper)
-
-      # # We define a distribution of baselines and draw `n_samples` from that
-      # # distribution in order to estimate the expectations of gradients across all baselines
-      # attributions, delta = gs.attribute(input_, stdevs=0.09, n_samples=4, baselines=baseline_dist,
-      #                               target=pred_class, return_convergence_delta=True)
-
-      # print('GradientShap Convergence Delta:', delta)
-      # print('GradientShap Average Delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
-
-      # attributions = attributions[0].permute(1,2,0).cpu().numpy()
-      # attributions = np.sum(np.abs(attributions), axis=-1)
-
-      # print(np.sum(attributions), attributions.shape)
-
-      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      # axs[0, 0].set_title('Attribution mask')
-      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 0].axis('off')
-      # axs[0, 1].set_title('Overlay GradientShap on Input image ')
-      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 1].imshow(img, alpha=0.5)
-      # axs[0, 1].axis('off')
-      # plt.tight_layout()
-      # plt.savefig(f'GradientShap_mask_{pred_class}.png', bbox_inches='tight')  
-
-      # # Deep Lift
-      # dl = DeepLift(wrapper)
-      # attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
-      # print('DeepLift Convergence Delta:', delta)
-
-      # attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
-      # attributions = np.sum(np.abs(attributions), axis=-1)
-
-      # print(np.sum(attributions), attributions.shape)
-
-      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      # axs[0, 0].set_title('Attribution mask')
-      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 0].axis('off')
-      # axs[0, 1].set_title('Overlay DeepLift on Input image ')
-      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 1].imshow(img, alpha=0.5)
-      # axs[0, 1].axis('off')
-      # plt.tight_layout()
-      # plt.savefig(f'Deeplift_mask_{pred_class}.png', bbox_inches='tight') 
-
-      # # Deep Lift SHAP
-      # dl = DeepLiftShap(wrapper)
-      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=pred_class, return_convergence_delta=True)
-      # print('Deep Lift SHAP Convergence Delta:', delta)
-      # print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
-
-      # attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
-      # attributions = np.sum(np.abs(attributions), axis=-1)
-
-      # print(np.sum(attributions), attributions.shape)
-
-      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      # axs[0, 0].set_title('Attribution mask')
-      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 0].axis('off')
-      # axs[0, 1].set_title('Overlay DeepLiftSHAP on Input image ')
-      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 1].imshow(img, alpha=0.5)
-      # axs[0, 1].axis('off')
-      # plt.tight_layout()
-      # plt.savefig(f'DeepliftSHAP_mask_{pred_class}.png', bbox_inches='tight') 
-
-      # # Saliency
-      # saliency = Saliency(wrapper)
-      # attribution = saliency.attribute(input_, target=pred_class)
-
-      # attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
-      # attributions = np.sum(np.abs(attributions), axis=-1)
-
-      # print(np.sum(attributions), attributions.shape)
-
-      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      # axs[0, 0].set_title('Attribution mask')
-      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 0].axis('off')
-      # axs[0, 1].set_title('Overlay Saliency on Input image ')
-      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      # axs[0, 1].imshow(img, alpha=0.5)
-      # axs[0, 1].axis('off')
-      # plt.tight_layout()
-      # plt.savefig(f'Saliency_mask_{pred_class}.png', bbox_inches='tight') 
+      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      axs[0, 0].set_title('Attribution mask')
+      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 0].axis('off')
+      axs[0, 1].set_title('Overlay Saliency on Input image ')
+      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 1].imshow(img, alpha=0.5)
+      axs[0, 1].axis('off')
+      plt.tight_layout()
+      plt.savefig(f'Saliency_mask_{pred_class}.png', bbox_inches='tight') 
 
       # InputXGradient
       inputxgradient = InputXGradient(wrapper)
@@ -241,16 +146,4 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       plt.tight_layout()
       plt.savefig(f'InputXGradient_mask_{pred_class}.png', bbox_inches='tight') 
 
-      # # Noise Tunnel + Integrated Gradients
-      # ig = IntegratedGradients(wrapper)
-      # nt = NoiseTunnel(ig)
-      # attributions, delta = nt.attribute(input_, nt_type='smoothgrad', stdevs=0.02, nt_samples=4,
-      #       baselines=baseline, target=pred_class, return_convergence_delta=True)
-      # print('IG + SmoothGrad Attributions:', attributions)
-      # print('Convergence Delta:', delta)
-      # print('Average delta per example', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
-      '''
-      RuntimeError: CUDA out of memory. Tried to allocate 3.66 GiB (GPU 0; 31.71 GiB total capacity;
-      23.53 GiB already allocated; 1.48 GiB free; 28.27 GiB reserved in total by PyTorch)
-      '''
