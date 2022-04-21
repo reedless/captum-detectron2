@@ -158,49 +158,45 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # Deep Lift
       dl = DeepLift(wrapper)
       attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
-      print('DeepLift Attributions:', attributions)
-      print('Convergence Delta:', delta)
+      print('DeepLift Convergence Delta:', delta)
 
-      '''
-      File "main.py", line 134, in <module>
-        attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
-      File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
-        return func(*args, **kwargs)
-      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 347, in attribute
-        gradients = self.gradient_func(wrapped_forward_func, inputs)
-      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 111, in compute_gradients
-        outputs = _run_forward(forward_fn, inputs, target_ind, additional_forward_args)
-      File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 448, in _run_forward
-        output = forward_func()
-      File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 390, in forward_fn
-        torch.cat((model_out[:, 0], model_out[:, 1])), target
-      IndexError: index 1 is out of bounds for dimension 1 with size 1
-      '''
+      attributions = attributions[0].permute(1,2,0).cpu().numpy()
+      attributions = np.sum(np.abs(attributions), axis=-1)
 
-      # # Deep Lift SHAP
-      # dl = DeepLiftShap(wrapper)
-      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
-      # print('DeepLiftSHAP Attributions:', attributions)
-      # print('Convergence Delta:', delta)
-      # print('Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      print(np.sum(attributions), attributions.shape)
 
-      '''
-          File "main.py", line 156, in <module>
-            attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
-          File "/usr/local/lib/python3.6/dist-packages/captum/log/__init__.py", line 35, in wrapper
-            return func(*args, **kwargs)
-          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 845, in attribute
-            custom_attribution_func=custom_attribution_func,
-          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 347, in attribute
-            gradients = self.gradient_func(wrapped_forward_func, inputs)
-          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/gradient.py", line 111, in compute_gradients
-            outputs = _run_forward(forward_fn, inputs, target_ind, additional_forward_args)
-          File "/usr/local/lib/python3.6/dist-packages/captum/_utils/common.py", line 448, in _run_forward
-            output = forward_func()
-          File "/usr/local/lib/python3.6/dist-packages/captum/attr/_core/deep_lift.py", line 390, in forward_fn
-            torch.cat((model_out[:, 0], model_out[:, 1])), target
-        IndexError: index 1 is out of bounds for dimension 1 with size 1
-      '''
+      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      axs[0, 0].set_title('Attribution mask')
+      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 0].axis('off')
+      axs[0, 1].set_title('Overlay GradientShap on Input image ')
+      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 1].imshow(img, alpha=0.5)
+      axs[0, 1].axis('off')
+      plt.tight_layout()
+      plt.savefig(f'Deeplift_mask_{pred_class}.png', bbox_inches='tight') 
+
+      # Deep Lift SHAP
+      dl = DeepLiftShap(wrapper)
+      attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+      print('Deep Lift SHAP Convergence Delta:', delta)
+      print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+
+      attributions = attributions[0].permute(1,2,0).cpu().numpy()
+      attributions = np.sum(np.abs(attributions), axis=-1)
+
+      print(np.sum(attributions), attributions.shape)
+
+      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      axs[0, 0].set_title('Attribution mask')
+      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 0].axis('off')
+      axs[0, 1].set_title('Overlay GradientShap on Input image ')
+      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      axs[0, 1].imshow(img, alpha=0.5)
+      axs[0, 1].axis('off')
+      plt.tight_layout()
+      plt.savefig(f'Deeplift SHAP_mask_{pred_class}.png', bbox_inches='tight') 
 
       # # Noise Tunnel + Integrated Gradients
       # ig = IntegratedGradients(wrapper)
