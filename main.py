@@ -1,8 +1,11 @@
 import cv2
 import torch
-from captum.attr import (DeepLift, DeepLiftShap, GradientShap,
-                         IntegratedGradients, LayerConductance,
-                         NeuronConductance, NoiseTunnel, LayerGradientXActivation)
+from captum.attr import (IntegratedGradients, GradientShap,
+                         DeepLift, DeepLiftShap,
+                         Saliency, InputXGradient,
+                         Deconvolution, GuidedBackprop, GuidedGradCam,
+                         FeatureAblation, FeaturePermutation, Occlusion,
+                         NoiseTunnel)
 from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
@@ -178,7 +181,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
 
       # # Deep Lift SHAP
       # dl = DeepLiftShap(wrapper)
-      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=pred_class, return_convergence_delta=True)
       # print('Deep Lift SHAP Convergence Delta:', delta)
       # print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
@@ -199,13 +202,14 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # plt.savefig(f'DeepliftSHAP_mask_{pred_class}.png', bbox_inches='tight') 
 
       # Saliency
-      
+      saliency = Saliency(wrapper)
+      attribution = saliency.attribute(input_, target=pred_class)
 
       # # Noise Tunnel + Integrated Gradients
       # ig = IntegratedGradients(wrapper)
       # nt = NoiseTunnel(ig)
       # attributions, delta = nt.attribute(input_, nt_type='smoothgrad', stdevs=0.02, nt_samples=4,
-      #       baselines=baseline, target=0, return_convergence_delta=True)
+      #       baselines=baseline, target=pred_class, return_convergence_delta=True)
       # print('IG + SmoothGrad Attributions:', attributions)
       # print('Convergence Delta:', delta)
       # print('Average delta per example', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
