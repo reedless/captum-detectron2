@@ -1,0 +1,63 @@
+Modified model loaded
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+tensor([ 2,  7, 12], device='cuda:0')
+Inside ModifiedImageList.from_tensors
+2
+PREDICTIONS: [torch.Size([2000, 81]), torch.Size([2000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+DeepLift Convergence Delta: tensor([-0.9905], device='cuda:0')
+18.551527 (480, 640)
+Inside ModifiedImageList.from_tensors
+10
+PREDICTIONS: [torch.Size([10000, 81]), torch.Size([10000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Deep Lift SHAP Convergence Delta: tensor([-2.3356e-06, -2.4414e-06, -2.4414e-06, -2.3463e-06, -2.4415e-06],
+       device='cuda:0')
+Deep Lift SHAP Average delta per example: tensor([-2.4013e-06], device='cuda:0')
+0.0046730433 (480, 640)
+Inside ModifiedImageList.from_tensors
+2
+PREDICTIONS: [torch.Size([2000, 81]), torch.Size([2000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+DeepLift Convergence Delta: tensor([-1.0032], device='cuda:0')
+21.248972 (480, 640)
+Inside ModifiedImageList.from_tensors
+10
+PREDICTIONS: [torch.Size([10000, 81]), torch.Size([10000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Deep Lift SHAP Convergence Delta: tensor([-2.3356e-06, -2.4414e-06, -2.4414e-06, -2.3463e-06, -2.4415e-06],
+       device='cuda:0')
+Deep Lift SHAP Average delta per example: tensor([-2.4013e-06], device='cuda:0')
+0.0046730433 (480, 640)
+Inside ModifiedImageList.from_tensors
+2
+PREDICTIONS: [torch.Size([2000, 81]), torch.Size([2000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+PREDICTIONS: [torch.Size([1000, 81]), torch.Size([1000, 320])]
+DeepLift Convergence Delta: tensor([-1.0705], device='cuda:0')
+25.62149 (480, 640)
+Inside ModifiedImageList.from_tensors
+10
+PREDICTIONS: [torch.Size([10000, 81]), torch.Size([10000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Inside ModifiedImageList.from_tensors
+5
+PREDICTIONS: [torch.Size([5000, 81]), torch.Size([5000, 320])]
+Deep Lift SHAP Convergence Delta: tensor([-2.3356e-06, -2.4414e-06, -2.4414e-06, -2.3463e-06, -2.4415e-06],
+       device='cuda:0')
+Deep Lift SHAP Average delta per example: tensor([-2.4013e-06], device='cuda:0')
+0.0046730437 (480, 640)
