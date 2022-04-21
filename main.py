@@ -180,7 +180,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       dl = DeepLiftShap(wrapper)
       attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
       print('Deep Lift SHAP Convergence Delta:', delta)
-      print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
+      print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
       attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
