@@ -155,48 +155,51 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # plt.tight_layout()
       # plt.savefig(f'GradientShap_mask_{pred_class}.png', bbox_inches='tight')  
 
-      # Deep Lift
-      dl = DeepLift(wrapper)
-      attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
-      print('DeepLift Convergence Delta:', delta)
+      # # Deep Lift
+      # dl = DeepLift(wrapper)
+      # attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
+      # print('DeepLift Convergence Delta:', delta)
 
-      attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
-      attributions = np.sum(np.abs(attributions), axis=-1)
+      # attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
 
-      print(np.sum(attributions), attributions.shape)
+      # print(np.sum(attributions), attributions.shape)
 
-      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      axs[0, 0].set_title('Attribution mask')
-      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 0].axis('off')
-      axs[0, 1].set_title('Overlay DeepLift on Input image ')
-      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 1].imshow(img, alpha=0.5)
-      axs[0, 1].axis('off')
-      plt.tight_layout()
-      plt.savefig(f'Deeplift_mask_{pred_class}.png', bbox_inches='tight') 
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay DeepLift on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'Deeplift_mask_{pred_class}.png', bbox_inches='tight') 
 
-      # Deep Lift SHAP
-      dl = DeepLiftShap(wrapper)
-      attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
-      print('Deep Lift SHAP Convergence Delta:', delta)
-      print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
+      # # Deep Lift SHAP
+      # dl = DeepLiftShap(wrapper)
+      # attributions, delta = dl.attribute(input_.float(), baseline_dist, target=0, return_convergence_delta=True)
+      # print('Deep Lift SHAP Convergence Delta:', delta)
+      # print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input_.shape[0], -1), dim=1))
 
-      attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
-      attributions = np.sum(np.abs(attributions), axis=-1)
+      # attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
 
-      print(np.sum(attributions), attributions.shape)
+      # print(np.sum(attributions), attributions.shape)
 
-      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      axs[0, 0].set_title('Attribution mask')
-      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 0].axis('off')
-      axs[0, 1].set_title('Overlay DeepLiftSHAP on Input image ')
-      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 1].imshow(img, alpha=0.5)
-      axs[0, 1].axis('off')
-      plt.tight_layout()
-      plt.savefig(f'DeepliftSHAP_mask_{pred_class}.png', bbox_inches='tight') 
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay DeepLiftSHAP on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'DeepliftSHAP_mask_{pred_class}.png', bbox_inches='tight') 
+
+      # Saliency
+      
 
       # # Noise Tunnel + Integrated Gradients
       # ig = IntegratedGradients(wrapper)
