@@ -201,9 +201,29 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # plt.tight_layout()
       # plt.savefig(f'DeepliftSHAP_mask_{pred_class}.png', bbox_inches='tight') 
 
-      # Saliency
-      saliency = Saliency(wrapper)
-      attribution = saliency.attribute(input_, target=pred_class)
+      # # Saliency
+      # saliency = Saliency(wrapper)
+      # attribution = saliency.attribute(input_, target=pred_class)
+
+      # attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
+
+      # print(np.sum(attributions), attributions.shape)
+
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay Saliency on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'Saliency_mask_{pred_class}.png', bbox_inches='tight') 
+
+      # InputXGradient
+      inputxgradient = InputXGradient(wrapper)
+      attribution = inputxgradient.attribute(input_, target=pred_class)
 
       attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
@@ -214,12 +234,12 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       axs[0, 0].set_title('Attribution mask')
       axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
       axs[0, 0].axis('off')
-      axs[0, 1].set_title('Overlay Saliency on Input image ')
+      axs[0, 1].set_title('Overlay InputXGradient on Input image ')
       axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
       axs[0, 1].imshow(img, alpha=0.5)
       axs[0, 1].axis('off')
       plt.tight_layout()
-      plt.savefig(f'Saliency_mask_{pred_class}.png', bbox_inches='tight') 
+      plt.savefig(f'InputXGradient_mask_{pred_class}.png', bbox_inches='tight') 
 
       # # Noise Tunnel + Integrated Gradients
       # ig = IntegratedGradients(wrapper)
