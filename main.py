@@ -1,8 +1,6 @@
 import cv2
 import torch
-from captum.attr import (IntegratedGradients, GradientShap,
-                         DeepLift, DeepLiftShap,
-                         Saliency, InputXGradient,
+from captum.attr import (Saliency, InputXGradient,
                          Deconvolution, GuidedBackprop, GuidedGradCam,
                          FeatureAblation, FeaturePermutation, Occlusion,
                          NoiseTunnel)
@@ -106,44 +104,62 @@ wrapper_model = WrapperModel()
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       wrapper = WrapperModel()
 
-      # Saliency
-      saliency = Saliency(wrapper)
-      attribution = saliency.attribute(input_, target=pred_class)
+      # Deconvolution
+      deconv = Deconvolution(wrapper)
+      attribution = deconv.attribute(input_, target=pred_class)
+      
+      # attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
 
-      attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
-      attributions = np.sum(np.abs(attributions), axis=-1)
+      # print(np.sum(attributions), attributions.shape)
 
-      print(np.sum(attributions), attributions.shape)
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay Deconvolution on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'Deconvolution_mask_{pred_class}.png', bbox_inches='tight') 
 
-      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      axs[0, 0].set_title('Attribution mask')
-      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 0].axis('off')
-      axs[0, 1].set_title('Overlay Saliency on Input image ')
-      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 1].imshow(img, alpha=0.5)
-      axs[0, 1].axis('off')
-      plt.tight_layout()
-      plt.savefig(f'Saliency_mask_{pred_class}.png', bbox_inches='tight') 
+      # Guided Backprop
+      gbp = GuidedBackprop(wrapper)
+      attribution = gbp.attribute(input_, target=pred_class)
 
-      # InputXGradient
-      inputxgradient = InputXGradient(wrapper)
-      attribution = inputxgradient.attribute(input_, target=pred_class)
+      # attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
 
-      attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
-      attributions = np.sum(np.abs(attributions), axis=-1)
+      # print(np.sum(attributions), attributions.shape)
 
-      print(np.sum(attributions), attributions.shape)
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay GuidedBackprop on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'GuidedBackprop_mask_{pred_class}.png', bbox_inches='tight') 
 
-      fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
-      axs[0, 0].set_title('Attribution mask')
-      axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 0].axis('off')
-      axs[0, 1].set_title('Overlay InputXGradient on Input image ')
-      axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
-      axs[0, 1].imshow(img, alpha=0.5)
-      axs[0, 1].axis('off')
-      plt.tight_layout()
-      plt.savefig(f'InputXGradient_mask_{pred_class}.png', bbox_inches='tight') 
+      # GuidedGradCam
+      guided_gc = GuidedGradCam(wrapper, wrapper.model.roi_heads.box_predictor)
+      attribution = guided_gc.attribute(input, target=pred_class)
 
+      # attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
+      # attributions = np.sum(np.abs(attributions), axis=-1)
 
+      # print(np.sum(attributions), attributions.shape)
+
+      # fig, axs = plt.subplots(nrows=1, ncols=2, squeeze=False, figsize=(8, 8))
+      # axs[0, 0].set_title('Attribution mask')
+      # axs[0, 0].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 0].axis('off')
+      # axs[0, 1].set_title('Overlay GuidedGradCam on Input image ')
+      # axs[0, 1].imshow(attributions, cmap=plt.cm.inferno)
+      # axs[0, 1].imshow(img, alpha=0.5)
+      # axs[0, 1].axis('off')
+      # plt.tight_layout()
+      # plt.savefig(f'GuidedGradCam_mask_{pred_class}.png', bbox_inches='tight') 
