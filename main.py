@@ -160,7 +160,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       attributions, delta = dl.attribute(input_, baseline, target=pred_class, return_convergence_delta=True)
       print('DeepLift Convergence Delta:', delta)
 
-      attributions = attributions[0].permute(1,2,0).cpu().numpy()
+      attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
 
       print(np.sum(attributions), attributions.shape)
@@ -182,7 +182,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       print('Deep Lift SHAP Convergence Delta:', delta)
       print('Deep Lift SHAP Average delta per example:', torch.mean(delta.reshape(input.shape[0], -1), dim=1))
 
-      attributions = attributions[0].permute(1,2,0).cpu().numpy()
+      attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
 
       print(np.sum(attributions), attributions.shape)
