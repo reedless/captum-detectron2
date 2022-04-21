@@ -1,11 +1,6 @@
 import cv2
 import torch
-from captum.attr import (IntegratedGradients, GradientShap,
-                         DeepLift, DeepLiftShap,
-                         Saliency, InputXGradient,
-                         Deconvolution, GuidedBackprop, GuidedGradCam,
-                         FeatureAblation, FeaturePermutation, Occlusion,
-                         NoiseTunnel)
+from captum.attr import Saliency, InputXGradient
 from detectron2 import model_zoo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
