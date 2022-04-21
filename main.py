@@ -205,7 +205,7 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       saliency = Saliency(wrapper)
       attribution = saliency.attribute(input_, target=pred_class)
 
-      attributions = attributions[0].permute(1,2,0).detach().cpu().numpy()
+      attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
 
       print(np.sum(attributions), attributions.shape)
