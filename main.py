@@ -121,15 +121,20 @@ for pred_class in outputs[0]['instances'].pred_classes.unique():
       # plt.tight_layout()
       # plt.savefig(f'GuidedGradCam_mask_{pred_class}.png', bbox_inches='tight') 
       
+      # # FeatureAblation
+      # ablator = FeatureAblation(wrapper)
+      # attr = ablator.attribute(input_, target=pred_class, show_progress=True)
+      '''Works'''
 
-      # FeatureAblation
-      ablator = FeatureAblation(wrapper)
-      attr = ablator.attribute(input_, target=pred_class, show_progress=True)
-
-      # FeaturePermutation
-      feature_perm = FeaturePermutation(wrapper)
-      attr = feature_perm.attribute(input_, target=pred_class, show_progress=True)
+      # # FeaturePermutation
+      # feature_perm = FeaturePermutation(wrapper)
+      # attr = feature_perm.attribute(input_, target=pred_class, show_progress=True)
+      '''
+      Requires inputs to be of batch_size > 1
+      Does not make sense for COCO due to large variety of classes
+      but should work for crocodile dataset.
+      '''
       
       # Occlusion
       ablator = Occlusion(wrapper)
-      attr = ablator.attribute(input_, target=pred_class, sliding_window_shapes=(3,3))
+      attr = ablator.attribute(input_, target=pred_class, sliding_window_shapes=(1, 3,3))
