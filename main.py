@@ -98,14 +98,13 @@ outputs = modified.inference(input_)
 print(outputs[0]['instances'].pred_classes.unique())
 
 modified.roi_heads.box_predictor.class_scores_only = True
-wrapper_model = WrapperModel()
 
 for pred_class in outputs[0]['instances'].pred_classes.unique():
       wrapper = WrapperModel()
 
       # GuidedGradCam
-      guided_gc = GuidedGradCam(wrapper, wrapper.model.roi_heads.box_predictor)
-      attribution = guided_gc.attribute(input_, target=pred_class)
+      guided_gc = GuidedGradCam(wrapper, wrapper.model.backbone)
+      attribution = guided_gc.attribute(input_, target=pred_class, attribute_to_layer_input=True)
 
       attributions = attribution[0].permute(1,2,0).detach().cpu().numpy()
       attributions = np.sum(np.abs(attributions), axis=-1)
